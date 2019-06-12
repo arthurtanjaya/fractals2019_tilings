@@ -32,12 +32,12 @@ classdef GraphApprox
                     if i == 2
                         cell = [];  % Annoying edge case
                     else
-                        cell = cell_addresses(cell_index);
+                        cell = cell_addresses(cell_index, :);
                     end
                     for head = 0:2
                         address = [head cell];
-                        % Pad the end of address with the last relevant bit
-                        address(end+1:level+1) = address(end);
+                        % Pad the end of address with the vertex bit
+                        address(end+1:level+1) = head;
                         % Assign addresses in a cyclic fashion
                         new_address = [address(1:i-1) ...
                                        mod(address(i)+1, 3) ...
