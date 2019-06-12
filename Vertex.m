@@ -145,6 +145,25 @@ classdef Vertex
 
         end
 
+        function draw(self, side)
+        %DRAW Draws the vertex in xy-plane
+        %   side controls the side length of the bounding triangle
+        %   Assumes that a figure window is already open and hold is on
+
+        % Start at a boundary point
+        q = [[0.5, 3^0.5/2];
+             [0, 0];
+             [1, 0]];
+        coord = q(self.address(1)+1, :) * side;  % Off-by-one again
+
+        % Apply IFS based on address of vertex
+        coord = ApplyIFS_2D(coord, self.address(2:end));
+
+        % Plot!
+        plot(coord(1), coord(2), '.')
+
+        end
+
     end
 
 end
