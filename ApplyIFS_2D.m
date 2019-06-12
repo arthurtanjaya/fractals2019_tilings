@@ -9,6 +9,6 @@ q = [[0.5, 3^0.5/2];
      [1, 0]];         % Fixed points of respective contractions
 F = @(x, i) r*(x-q(i+1, :)) + q(i+1, :);  % Contractions
 
-for w = word
+for w = word(end:-1:1)
     coord = F(coord, w);  % This annoying 0/1-indexing issue...
 end
