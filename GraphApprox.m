@@ -14,7 +14,8 @@ classdef GraphApprox
             %   Input should be an int; no error checking (yet?)
 
             self.level = level;
-
+            
+            % Construct vertices
             % Construct V_0
             Z = zeros(1, level+1);  % Off-by-one ugh.
             self.vertices = [Vertex(Z) Vertex(Z+1) Vertex(Z+2)];
@@ -49,7 +50,10 @@ classdef GraphApprox
                 self.vertices = [self.vertices new_vertices];  % Save updates
             end
 
-            % Construct edges (HOW?)
+            % Construct edges
+            % Two vertices share an edge iff they are in the same m-cell
+            % Can postpone this, because we can just count neighbors then
+            % divide by 2
             self.edges = 0;
 
         end
@@ -67,6 +71,18 @@ classdef GraphApprox
         function edges = get_edges(self)
             %GET_EDGES Returns edges
             edges = self.edges;
+        end
+
+        function draw(self, side)
+        %DRAW Draws the graph in xy-plane
+        %   side controls the side length of the bounding triangle
+        %   Assumes that a figure window is already open and hold is on
+
+        % Draw vertices
+        for vertex = self.vertices
+            vertex.draw(side)
+        end
+
         end
 
     end
