@@ -43,7 +43,7 @@ classdef Vertex
             % Looks at the first values...
             q = point(1);
             % For each listed map...
-            for i = 2:self.level
+            for i = 2:self.level+1
                 % Looks for the first point that departs from q
                 if point(i) ~= q
                     % and sees what direction it goes in,
@@ -74,7 +74,7 @@ classdef Vertex
             % Looks at the first values...
             q = point(1);
             % For each listed map...
-            for i = 2:self.level
+            for i = 2:self.level+1
                 % Looks for the first point that departs from q
                 if point(i) ~= q
                     % and sees what direction it goes in,
