@@ -1,8 +1,7 @@
 classdef Vertex
     %VERTEX For vertices in \Gamma_m
-    %   ???
 
-    properties
+    properties (SetAccess = private)
         level      % Level of fineness (this is m in \Gamma_m)
         address    % A word of length m (row vector)
         neighbors  % A vector of addresses of its neighbors
@@ -13,11 +12,24 @@ classdef Vertex
         function self = Vertex(address)
             %VERTEX Construct an instance of this class
             %   Input should be a valid address; no error checking (yet?)
-
-            self.level = length(address);
+            self.level = length(address)-1;  % Off-by-one ugh.
             self.address = address;
-            self.neighbors = self.get_neighbors();
+            self = self.set_neighbors();
+        end
 
+        function level = get_level(self)
+            %GET_LEVEL Returns level
+            level = self.level;
+        end
+
+        function address = get_address(self)
+            %GET_ADDRESS Returns address
+            address = self.address;
+        end
+
+        function neighbors = get_neighbors(self)
+            %GET_NEIGHBORS Returns neighbors
+            neighbors = self.neighbors;
         end
 
         function point = get_primary(self)
@@ -82,22 +94,21 @@ classdef Vertex
 
         end
 
-        function neighbors = get_neighbors(self)
-            %GET_NEIGHBORS Returns addresses of neighbors of self
-            %   ???
+        function self = set_neighbors(self)
+            %SET_NEIGHBORS Updates addresses of neighbors of self
 
             if all(self.address == self.address(1))
                 % Case 1: self is a boundary point
                 % Then it has only 2 neighbors
                 if self.address(1) == 0
-                    neighbors = [[self.address(1:end-1) 1];
-                                 [self.address(1:end-1) 2]];
+                    self.neighbors = [[self.address(1:end-1) 1];
+                                      [self.address(1:end-1) 2]];
                 elseif self.address(1) == 1
-                    neighbors = [[self.address(1:end-1) 0];
-                                 [self.address(1:end-1) 2]];
+                    self.neighbors = [[self.address(1:end-1) 0];
+                                      [self.address(1:end-1) 2]];
                 else  % self.address(1) == 2
-                    neighbors = [[self.address(1:end-1) 0];
-                                 [self.address(1:end-1) 1]];
+                    self.neighbors = [[self.address(1:end-1) 0];
+                                      [self.address(1:end-1) 1]];
                 end
             else
                 % Case 2: self is not a boundary point
@@ -105,29 +116,29 @@ classdef Vertex
                 % 2 of them come from one cell
                 primary = self.get_primary();
                 if primary(end) == 0
-                    neighbors = [[primary(1:end-1) 1];
-                                 [primary(1:end-1) 2]];
+                    self.neighbors = [[primary(1:end-1) 1];
+                                      [primary(1:end-1) 2]];
                 elseif primary(end) == 1
-                    neighbors = [[primary(1:end-1) 0];
-                                 [primary(1:end-1) 2]];
+                    self.neighbors = [[primary(1:end-1) 0];
+                                      [primary(1:end-1) 2]];
                 else  % primary(end) == 2
-                    neighbors = [[primary(1:end-1) 0];
-                                 [primary(1:end-1) 1]];
+                    self.neighbors = [[primary(1:end-1) 0];
+                                      [primary(1:end-1) 1]];
                 end
                 % The other 2 come from another cell
                 secondary = self.get_secondary();
                 if secondary(end) == 0
-                    neighbors = [neighbors;
-                                 [secondary(1:end-1) 1];
-                                 [secondary(1:end-1) 2]];
+                    self.neighbors = [self.neighbors;
+                                      [secondary(1:end-1) 1];
+                                      [secondary(1:end-1) 2]];
                 elseif secondary(end) == 1
-                    neighbors = [neighbors;
-                                 [secondary(1:end-1) 0];
-                                 [secondary(1:end-1) 2]];
+                    self.neighbors = [self.neighbors;
+                                      [secondary(1:end-1) 0];
+                                      [secondary(1:end-1) 2]];
                 else  % secondary(end) == 2
-                    neighbors = [neighbors;
-                                 [secondary(1:end-1) 0];
-                                 [secondary(1:end-1) 1]];
+                    self.neighbors = [self.neighbors;
+                                      [secondary(1:end-1) 0];
+                                      [secondary(1:end-1) 1]];
                 end
             end
 
