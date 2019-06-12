@@ -1,6 +1,24 @@
 % Script for testing
 % Currently very rudimentary
 
+close all
+clear
+clc
+
+x = Vertex([0 1 2])
+y = Vertex([1 0 1])
+z = Vertex([1 0 0])
+
+G = GraphApprox(3)
+
+figure
+hold on
+%x.draw(1)
+%y.draw(1)
+%z.draw(1)
+G.draw(1)
+hold off
+
 u = [1  0 0;
      2  3 0;
      4  5 6];
