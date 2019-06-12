@@ -37,27 +37,21 @@ classdef Vertex
             %GET_PRIMARY Returns primary address
             %   Passthrough if primary already
             %   Twin to get_secondary()
-            %   Adapted from https://github.com/seraphinalee/fractals
+            %   Given $F_wq_i$ with $\left|w\right| = m$, the other address
+            %   can be found using the following procedure.
+            %   Let $n$ be the least integer such that $w_k = i$ for all 
+            %   $n < k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,
+            %   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).
 
-            point = self.address;  % TODO Is this a shallow or deep copy???
-            % Looks at the first values...
+            point = self.address;
             q = point(1);
-            % For each listed map...
-            for i = 2:self.level+1
-                % Looks for the first point that departs from q
-                if point(i) ~= q
-                    % and sees what direction it goes in,
-                    % correcting if necessary
-                    if isequal(point(i-1:i), [1 0])
-                        point(i-1:i) = [0 1];
-                        point(1:i-1) = point(i-1);
-                    elseif isequal(point(i-1:i), [2 1])
-                        point(i-1:i) = [1 2];
-                        point(1:i-1) = point(i-1);
-                    elseif isequal(point(i-1:i), [0 2])
-                        point(i-1:i) = [2 0];
-                        point(1:i-1) = point(i-1);
-                    end
+            for i = self.level+1:-1:2
+                if point(i) < q  % Different and currently secondary
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    return
+                elseif point(i) > q  % Different but already primary
                     return
                 end
             end
@@ -68,27 +62,21 @@ classdef Vertex
             %GET_SECONDARY Returns secondary address
             %   Passthrough if secondary already
             %   Twin to get_primary()
-            %   Adapted from https://github.com/seraphinalee/fractals
+            %   Given $F_wq_i$ with $\left|w\right| = m$, the other address
+            %   can be found using the following procedure.
+            %   Let $n$ be the least integer such that $w_k = i$ for all 
+            %   $n < k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,
+            %   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).
 
-            point = self.address;  % TODO Is this a shallow or deep copy???
-            % Looks at the first values...
+            point = self.address;
             q = point(1);
-            % For each listed map...
-            for i = 2:self.level+1
-                % Looks for the first point that departs from q
-                if point(i) ~= q
-                    % and sees what direction it goes in,
-                    % correcting if necessary
-                    if isequal(point(i-1:i), [0 1])
-                        point(i-1:i) = [1 0];
-                        point(1:i-1) = point(i-1);
-                    elseif isequal(point(i-1:i), [1 2])
-                        point(i-1:i) = [2 1];
-                        point(1:i-1) = point(i-1);
-                    elseif isequal(point(i-1:i), [2 0])
-                        point(i-1:i) = [0 2];
-                        point(1:i-1) = point(i-1);
-                    end
+            for i = self.level+1:-1:2
+                if point(i) > q  % Different and currently primary
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    return
+                elseif point(i) < q  % Different but already secondary
                     return
                 end
             end
@@ -160,7 +148,7 @@ classdef Vertex
         coord = ApplyIFS_2D(coord, self.address(2:end));
 
         % Plot!
-        plot(coord(1), coord(2), '.')
+        plot(coord(1), coord(2), '.r', 'MarkerSize', 20)
 
         end
 
