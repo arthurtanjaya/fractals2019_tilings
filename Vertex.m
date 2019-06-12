@@ -14,6 +14,7 @@ classdef Vertex
             %   Input should be a valid address; no error checking (yet?)
             self.level = length(address)-1;  % Off-by-one ugh.
             self.address = address;
+            self.address = self.get_primary();
             self = self.set_neighbors();
         end
 
