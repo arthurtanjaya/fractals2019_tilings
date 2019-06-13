@@ -58,31 +58,14 @@ classdef GraphApprox
 
         end
 
-        function level = get_level(self)
-            %GET_LEVEL Returns level
-            level = self.level;
-        end
-
-        function vertices = get_vertices(self)
-            %GET_VERTICES Returns vertices
-            vertices = self.vertices;
-        end
-
-        function edges = get_edges(self)
-            %GET_EDGES Returns edges
-            edges = self.edges;
-        end
-
         function draw(self, side)
-        %DRAW Draws the graph in xy-plane
-        %   side controls the side length of the bounding triangle
-        %   Assumes that a figure window is already open and hold is on
-
-        % Draw vertices
-        for vertex = self.vertices
-            vertex.draw(side)
-        end
-
+            %DRAW Draws the graph in xy-plane
+            %   side controls the side length of the bounding triangle
+            %   Assumes that a figure window is already open and hold is on
+            % Draw vertices
+            for vertex = self.vertices
+                vertex.draw(side)
+            end
         end
 
     end
