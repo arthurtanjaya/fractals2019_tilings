@@ -5,6 +5,7 @@ classdef Vertex
         level      % Level of fineness (this is m in \Gamma_m)
         address    % A word of length m (row vector)
         neighbors  % A vector of addresses of its neighbors
+        xycoords   % Coordinates in the Cartesian plane
     end
 
     methods
@@ -16,21 +17,7 @@ classdef Vertex
             self.address = address;
             self.address = self.get_primary();
             self = self.set_neighbors();
-        end
-
-        function level = get_level(self)
-            %GET_LEVEL Returns level
-            level = self.level;
-        end
-
-        function address = get_address(self)
-            %GET_ADDRESS Returns address
-            address = self.address;
-        end
-
-        function neighbors = get_neighbors(self)
-            %GET_NEIGHBORS Returns neighbors
-            neighbors = self.neighbors;
+            self = self.set_xycoords();
         end
 
         function point = get_primary(self)
@@ -133,23 +120,23 @@ classdef Vertex
 
         end
 
+        function self = set_xycoords(self)
+            %SET_NEIGHBORS Updates addresses of neighbors of self
+            % Start at a boundary point
+            q = [[0.5, 3^0.5/2];
+                 [0, 0];
+                 [1, 0]];
+            self.xycoords = q(self.address(1)+1, :);  % Off-by-one again
+            % Apply IFS based on address of vertex
+            self.xycoords = ApplyIFS_2D(self.xycoords, self.address(2:end));
+        end
+
         function draw(self, side)
         %DRAW Draws the vertex in xy-plane
         %   side controls the side length of the bounding triangle
         %   Assumes that a figure window is already open and hold is on
-
-        % Start at a boundary point
-        q = [[0.5, 3^0.5/2];
-             [0, 0];
-             [1, 0]];
-        coord = q(self.address(1)+1, :) * side;  % Off-by-one again
-
-        % Apply IFS based on address of vertex
-        coord = ApplyIFS_2D(coord, self.address(2:end));
-
-        % Plot!
-        plot(coord(1), coord(2), '.r', 'MarkerSize', 20)
-
+        coords = self.xycoords * side;
+        plot(coords(1), coords(2), '.r')
         end
 
     end

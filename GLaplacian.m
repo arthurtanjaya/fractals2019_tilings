@@ -8,7 +8,7 @@ npts = length(pts);
 lapl = [];
 for i = 1:npts
     laplP = 0;
-    nbrs = pts(i).get_neighbors;
+    nbrs = pts(i).neighbors;
     for j = 1:npts
         if ismember(get_primary(pts(j)),nbrs,'rows') || ismember(get_secondary(pts(j)),nbrs,'rows')
             laplP = laplP + (u(j)-u(i));
