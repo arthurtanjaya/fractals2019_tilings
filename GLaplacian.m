@@ -5,14 +5,15 @@ function lapl = GLaplacian(gamma, u)
 % function on the i'th vertex
 pts = gamma.vertices;
 npts = length(pts);
-lapl = zeros([1,npts]);
+lapl = [];
 for i = 1:npts
     laplP = 0;
+    nbrs = pts(i).get_neighbors;
     for j = 1:npts
-        if ismember(get_address(pts(j)),pts(i).get_neighbors)
+        if ismember(get_primary(pts(j)),nbrs,'rows') || ismember(get_secondary(pts(j)),nbrs,'rows')
             laplP = laplP + (u(j)-u(i));
         end
-        lapl(i) = laplP;
     end
+    lapl = [lapl,laplP];
 end
 end
