@@ -8,7 +8,7 @@ energy = 0;
 npts = length(pts);
 for i = 1:npts
     for j = 1:(i-1)
-        if ismember(get_address(pts(j)),pts(i).get_neighbors)
+        if ismember(get_primary(pts(j)),nbrs,'rows') || ismember(get_secondary(pts(j)),nbrs,'rows')
             energy = energy + (u(i)-u(j))*(v(i)-v(j));
         end
     end
