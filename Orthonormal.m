@@ -57,14 +57,14 @@ classdef Orthonormal
             acc = [];
             for i = 1:dim
                 if ismember(data.eigenvalues(i), acc)
-                for j = 1 : i
-                    if data.eigenvalues(i) ~= data.eigenvalues(j)
-                        indep(i,j) = 0;
-                        indep(j,i) = 0;
+                    for j = 1 : i
+                        if data.eigenvalues(i) ~= data.eigenvalues(j)
+                            indep(i,j) = 0;
+                            indep(j,i) = 0;
+                        end
                     end
-                end
                 else
-                    for j = 1 : dim 
+                    for j = 1 : dim
                         indep(j,i) = 0;
                     end
                     indep(i,i) = 1;
@@ -86,8 +86,49 @@ classdef Orthonormal
                     end
                 end
             end
-            resP.*indep
             orthB = (data.x)*(resP.*indep);
+        end
+        
+        function [orth,sol] = FindSpectrum(basis, tile)
+            digits(5)
+            dim = length(basis.eigenvalues);
+            sdim = length(tile);
+            syms P [dim dim];
+            assume(P, 'real')
+            indep = ones([dim, dim]);
+            for i = 1:dim
+                for j = 1 : i
+                    if basis.eigenvalues(i) ~= basis.eigenvalues(j)
+                        indep(i,j) = 0;
+                        indep(j,i) = 0;
+                    end
+                end
+            end
+            new = (basis.x)*(P.*indep);
+            for n = 1:10
+                chosen = randperm(dim, sdim)
+                subnew = new(tile, chosen);
+                eqa = simplify(vpa(subnew'*subnew) == eye(sdim))
+                sol = solve(reshape(eqa, [1, sdim^2]));
+                resP = zeros([dim dim]);
+                for i = 1 : dim
+                    for j = 1 : dim
+                        if isfield(sol, strcat('P',int2str(i),'_',int2str(j))) && not(isempty(sol.(strcat('P',int2str(i),'_',int2str(j)))))
+                            resP(i,j) = subs(sol.(strcat('P',int2str(i),'_',int2str(j)))(1,1), P, zeros([dim dim]));
+                        else
+                            resP(i, j) = 0;
+                        end
+                    end
+                end
+                if resP == zeros([dim dim])
+                    continue
+                else
+                    orthB = (basis.x)*(resP.*indep);
+                    orth = orthB(1:end,chosen);
+                    return
+                end
+            end
+            "aaa"
         end
     end
 end
