@@ -10,6 +10,15 @@ classdef EF
             eigenfunctionCheck = norm(laplpar+eigenvalue*eigenfunction(4:npts)) < 0.001;
         end
         
+        function ok = EigenfunctionsCheck(level, efs, evs)
+            [n, ~] = size(efs);
+            arr = zeros([1, n]);
+            for i = 1 : n
+                arr(i) = EF.EigenfunctionCheck(level, evs(i,1), efs(i, 1:end));
+            end
+            ok = all(arr);
+        end
+        
         function eigenfunctions = Eigenfunctions(level,eigenvalue)
             %EIGENFUNCTION is a Dirichlet eigenfunction of /eigenvalue
             npts = length(GraphApprox(level).vertices);
@@ -17,7 +26,7 @@ classdef EF
             laplvar = GLaplacian(GraphApprox(level),x);
             laplparvar = laplvar(4:npts);
             eigenfunctions = solve([laplparvar == -sym(eigenvalue)*x(4:npts), x(1:3) == [0,0,0], norm(x)^2~= 0], x, 'ReturnCondition', true);
-        end 
+        end
         
         function EFandEV = EigenfunctionsAll(level)
             %EFandEV finds all eigenvalues and eigenfunctions of the
@@ -29,6 +38,6 @@ classdef EF
             laplparvar = laplvar(4:npts);
             EFandEV = solve([laplparvar == -ev*x(4:npts), x(1:3) == [0,0,0], norm(x)^2~=0], [x, ev], 'ReturnCondition', true);
         end
-            
+        
     end
 end
