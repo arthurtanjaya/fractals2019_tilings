@@ -10,8 +10,9 @@ classdef EF
             eigenfunctionCheck = norm(laplpar+eigenvalue*eigenfunction(4:npts)) < 0.001;
         end
         
-        function ok = EigenfunctionsCheck(level, efs, evs)
-            [n, ~] = size(efs);
+        function ok = EigenfunctionsCheck(efs, evs)
+            [n, plevel] = size(efs);
+            level = int8(log(2*plevel - 3)/log(3) - 1);
             arr = zeros([1, n]);
             for i = 1 : n
                 arr(i) = EF.EigenfunctionCheck(level, evs(i,1), efs(i, 1:end));

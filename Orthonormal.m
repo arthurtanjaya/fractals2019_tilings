@@ -8,6 +8,7 @@ classdef Orthonormal
                     orthArray((i^2-i)/2+j) = dot(functions(i,:),functions(j,:));
                 end
                 orthArray((i^2+i)/2) = norm(functions(i,:))^2-1;
+                endS
             end
         end
         
@@ -75,7 +76,7 @@ classdef Orthonormal
             new = (data.x)*(P.*indep);
             eqa = Orthonormal.OrthogonalityCheck(new') == zeros([1, (dim ^2 + dim)/2]);
             reshape(eqa, [(dim^2+dim)/2, 1])
-            sol = solve(eqa)
+            sol = solve(eqa);
             resP = zeros([dim dim]);
             for i = 1 : dim
                 for j = 1 : dim
@@ -89,7 +90,7 @@ classdef Orthonormal
             orthB = (data.x)*(resP.*indep);
         end
         
-        function [orth,sol] = FindSpectrum(basis, tile)
+        function [orth, eigenvalues] = FindSpectrum(basis, tile, limit)
             digits(5)
             dim = length(basis.eigenvalues);
             sdim = length(tile);
@@ -105,10 +106,10 @@ classdef Orthonormal
                 end
             end
             new = (basis.x)*(P.*indep);
-            for n = 1:10
-                chosen = randperm(dim, sdim)
+            for n = 1:limit
+                chosen = randperm(dim, sdim);
                 subnew = new(tile, chosen);
-                eqa = simplify(vpa(subnew'*subnew) == eye(sdim))
+                eqa = simplify(vpa(subnew'*subnew) == eye(sdim));
                 sol = solve(reshape(eqa, [1, sdim^2]));
                 resP = zeros([dim dim]);
                 for i = 1 : dim
@@ -125,10 +126,20 @@ classdef Orthonormal
                 else
                     orthB = (basis.x)*(resP.*indep);
                     orth = orthB(1:end,chosen);
+                    eigenvalues = basis.eigenvalues(chosen);
+                    if logical(norm(double(orth(tile, 1:end)'*orth(tile, 1:end)) - eye(sdim)) > 0.01)
+                        double(orth(tile, 1:end)'*orth(tile, 1:end))
+                        "not o.n."
+                    elseif not(EF.EigenfunctionsCheck(orth', eigenvalues'))
+                        "not basis"
+                    else
+                        "OK"
+                    end
                     return
                 end
             end
-            "aaa"
+            orth = [];
+            eigenvalues = [];
         end
     end
 end
