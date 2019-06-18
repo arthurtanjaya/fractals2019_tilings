@@ -1,0 +1,4 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<Info Type="StartUp" Visible="0" Icon="" File="SpectralDecimation.m" Name="SpectralDecimation">
+    <Extension Value="3ad240db-95a1-4625-b294-c4aa36a663f8" Name="StartUpPrev" />
+</Info>
