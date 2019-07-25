@@ -39,7 +39,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    background: transparent
+    background: transparent;
 }
 
 body {
@@ -48,33 +48,32 @@ body {
 }
 
 ol, ul {
-    list-style: none
+    list-style: none;
 }
 
 blockquote, q {
-    quotes: none
+    quotes: none;
 }
 
 blockquote:before, blockquote:after, q:before, q:after {
-    content: '';
-    content: none
+    content: none;
 }
 
 :focus {
-    outine: 0
+    outline: 0;
 }
 
 ins {
-    text-decoration: none
+    text-decoration: none;
 }
 
 del {
-    text-decoration: line-through
+    text-decoration: line-through;
 }
 
 table {
     border-collapse: collapse;
-    border-spacing: 0
+    border-spacing: 0;
 }
 
 html {
@@ -275,23 +274,23 @@ pre.error {
 }
 
 span.keyword {
-    color: #0000FF
+    color: #0000FF;
 }
 
 span.comment {
-    color: #228B22
+    color: #228B22;
 }
 
 span.string {
-    color: #A020F0
+    color: #A020F0;
 }
 
 span.untermstring {
-    color: #B20000
+    color: #B20000;
 }
 
 span.syscmd {
-    color: #B28C00
+    color: #B28C00;
 }
 
 .footer {
