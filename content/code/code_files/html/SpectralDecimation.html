@@ -1,0 +1,391 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>SpectralDecimation</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-25"><meta name="DC.source" content="SpectralDecimation.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> SpectralDecimation
+
+    <span class="keyword">methods</span>(Static)
+        <span class="keyword">function</span> evlist = Eigenvalues(level)
+            <span class="comment">%EIGENVLAUES(level) gives a list of eigenvalues</span>
+            <span class="keyword">if</span> level == 1
+                evlist = [2, 5];
+            <span class="keyword">else</span>
+                evlist = [5, 6];
+                prev = SpectralDecimation.Eigenvalues(level - 1);
+                <span class="keyword">for</span> i = 1 : length(prev)
+                    ev = prev(i);
+                    evlist = [evlist, (5+(25-4*ev)^(1/2))/2, (5-(25-4*ev)^(1/2))/2];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = Initial(level)
+            <span class="comment">%INITIAL(level) gives the list of initial eigenfunctions and</span>
+            <span class="comment">%the corresponding eigenvalues (which are 2, 5, and 6).</span>
+            <span class="comment">%Eigenfunctions are represented as column vectors, eigenvalues</span>
+            <span class="comment">%are stored in a row vector.</span>
+            <span class="keyword">if</span> level == 1
+                twos = EF.Eigenfunctions(level, 2);
+                dim1 = length(twos.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim1
+                        new.x(i,j) = subs(twos.(strcat(<span class="string">'x'</span>,int2str(i))), twos.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                fives = EF.Eigenfunctions(level, 5);
+                dim2 = length(fives.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim2
+                        new.x(i,dim1 + j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                new.eigenvalues = [2*ones([1,dim1]), 5*ones([1,dim2])];
+
+            <span class="keyword">else</span>
+                fives = EF.Eigenfunctions(level, 5);
+                dim1 = length(fives.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim1
+                        new.x(i,j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                sixes = EF.Eigenfunctions(level, 6);
+                dim2 = length(sixes.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim2
+                        new.x(i, dim1 + j) = subs(sixes.(strcat(<span class="string">'x'</span>,int2str(i))), sixes.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                new.eigenvalues = [5*ones([1,dim1]), 6*ones([1,dim2,1])];
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> expand = Continued(level, eigenvalue, old)
+            <span class="comment">%CONTINUED(l, e, old) gives the list of continued</span>
+            <span class="comment">%eigenfunctions with eigenvalue e</span>
+            <span class="comment">%that result from eigenfunction old on SG</span>
+            <span class="comment">%approximation of level l-1.</span>
+            expand = zeros([1, (3^(level+1)+3)/2]);
+            SG = GraphApprox(level).vertices;
+            SGprev = GraphApprox(level - 1).vertices;
+            <span class="keyword">for</span> j = 1 : (3^(level+1) + 3)/2
+                <span class="keyword">if</span> SG(j).address(1) == SG(j).address(end)
+                    oldaddress = SG(j).address(1:end-1);
+                    expand(1,j) = old(GraphApprox.lookup(SGprev,level-1,oldaddress));
+                <span class="keyword">else</span>
+                    nbrs = SG(j).neighbors;
+                    fx1x2 = [];
+                    y1y2 = [];
+                    <span class="keyword">for</span> l = 1 : 4
+                        nbr = nbrs(l,:);
+                        <span class="keyword">if</span> nbr(1) == nbr(end)
+                            fx1x2 = [fx1x2, old(GraphApprox.lookup(SGprev,level-1,nbr(1:end-1)))];
+                        <span class="keyword">else</span>
+                            y1y2 = [y1y2, GraphApprox.lookup(SG,level,nbr)];
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                    x3b = intersect(SG(y1y2(1)).neighbors, SG(y1y2(2)).neighbors, <span class="string">'rows'</span>);
+                    <span class="keyword">for</span> m = 1 : 2
+                        t = x3b(m,:);
+                        <span class="keyword">if</span> t(1) == t(end)
+                            fx3 = old(GraphApprox.lookup(SGprev,level-1,t(1:end-1)));
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                    fy0 = ((4 - eigenvalue) * (fx1x2(1) + fx1x2(2)) + 2 * fx3)/((2 - eigenvalue)*(5 - eigenvalue));
+                    expand(1,j) = fy0;
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> result = Expand(level, old, varargin)
+            result{1} = [];
+            result{2} = [];
+            result{3} = old{3};
+            <span class="keyword">if</span> nargin == 2
+            <span class="keyword">for</span> i = 1 : length(old{2})
+                ev = old{2}(i);
+                evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                newplus = SpectralDecimation.Continued(level, evplus, old{1}(1:end,i)');
+                newminus = SpectralDecimation.Continued(level, evminus, old{1}(1:end,i)');
+                <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
+                    result{2} = [result{2}, evplus];
+                    result{1} = [result{1}, newplus'];
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
+                    result{2} = [result{2}, evminus];
+                    result{1} = [result{1}, newminus'];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            <span class="keyword">else</span>
+                seq = varargin{1};
+                <span class="keyword">for</span> i = 1 : length(seq)
+                    ev = old{2}(i);
+                    <span class="keyword">if</span> seq(i) &gt;= 0
+                        evnew = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    <span class="keyword">else</span>
+                        evnew = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    <span class="keyword">end</span>
+                    new = SpectralDecimation.Continued(level, evnew, old{1}(1:end,i)');
+                    <span class="keyword">if</span> evnew ~= 2 &amp;&amp; evnew ~= 5
+                        result{2} = [result{2}, evnew];
+                        result{1} = [result{1}, new'];
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> result = Eigenfunctions(level)
+            result = SpectralDecimation.Initial(level);
+            <span class="keyword">if</span> level &gt; 1
+                old = SpectralDecimation.Eigenfunctions(level - 1);
+                <span class="keyword">for</span> i = 1 : length(old.eigenvalues)
+                    ev = old.eigenvalues(i);
+                    evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    newplus = SpectralDecimation.Continued(level, evplus, old.x(1:end,i)');
+                    newminus = SpectralDecimation.Continued(level, evminus, old.x(1:end,i)');
+                    <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evplus];
+                        result.x = [result.x, newplus'];
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evminus];
+                        result.x = [result.x, newminus'];
+                    <span class="keyword">end</span>
+
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+ans = 
+
+  SpectralDecimation with no properties.
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+classdef SpectralDecimation
+    
+    methods(Static)
+        function evlist = Eigenvalues(level)
+            %EIGENVLAUES(level) gives a list of eigenvalues
+            if level == 1
+                evlist = [2, 5];
+            else
+                evlist = [5, 6];
+                prev = SpectralDecimation.Eigenvalues(level - 1);
+                for i = 1 : length(prev)
+                    ev = prev(i);
+                    evlist = [evlist, (5+(25-4*ev)^(1/2))/2, (5-(25-4*ev)^(1/2))/2];
+                end
+            end
+        end
+        
+        function new = Initial(level)
+            %INITIAL(level) gives the list of initial eigenfunctions and
+            %the corresponding eigenvalues (which are 2, 5, and 6).
+            %Eigenfunctions are represented as column vectors, eigenvalues
+            %are stored in a row vector.
+            if level == 1
+                twos = EF.Eigenfunctions(level, 2);
+                dim1 = length(twos.parameters);
+                for i = 1 : (3^(level+1) + 3)/ 2
+                    for j = 1 : dim1
+                        new.x(i,j) = subs(twos.(strcat('x',int2str(i))), twos.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    end
+                end
+                fives = EF.Eigenfunctions(level, 5);
+                dim2 = length(fives.parameters);
+                for i = 1 : (3^(level+1) + 3)/ 2
+                    for j = 1 : dim2
+                        new.x(i,dim1 + j) = subs(fives.(strcat('x',int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    end
+                end
+                new.eigenvalues = [2*ones([1,dim1]), 5*ones([1,dim2])];
+                
+            else
+                fives = EF.Eigenfunctions(level, 5);
+                dim1 = length(fives.parameters);
+                for i = 1 : (3^(level+1) + 3)/ 2
+                    for j = 1 : dim1
+                        new.x(i,j) = subs(fives.(strcat('x',int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    end
+                end
+                sixes = EF.Eigenfunctions(level, 6);
+                dim2 = length(sixes.parameters);
+                for i = 1 : (3^(level+1) + 3)/ 2
+                    for j = 1 : dim2
+                        new.x(i, dim1 + j) = subs(sixes.(strcat('x',int2str(i))), sixes.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    end
+                end
+                new.eigenvalues = [5*ones([1,dim1]), 6*ones([1,dim2,1])];
+            end
+        end
+        
+        function expand = Continued(level, eigenvalue, old)
+            %CONTINUED(l, e, old) gives the list of continued
+            %eigenfunctions with eigenvalue e 
+            %that result from eigenfunction old on SG
+            %approximation of level l-1.
+            expand = zeros([1, (3^(level+1)+3)/2]);
+            SG = GraphApprox(level).vertices;
+            SGprev = GraphApprox(level - 1).vertices;
+            for j = 1 : (3^(level+1) + 3)/2
+                if SG(j).address(1) == SG(j).address(end)
+                    oldaddress = SG(j).address(1:end-1);
+                    expand(1,j) = old(GraphApprox.lookup(SGprev,level-1,oldaddress));
+                else
+                    nbrs = SG(j).neighbors;
+                    fx1x2 = [];
+                    y1y2 = [];
+                    for l = 1 : 4
+                        nbr = nbrs(l,:);
+                        if nbr(1) == nbr(end)
+                            fx1x2 = [fx1x2, old(GraphApprox.lookup(SGprev,level-1,nbr(1:end-1)))];
+                        else
+                            y1y2 = [y1y2, GraphApprox.lookup(SG,level,nbr)];
+                        end
+                    end
+                    x3b = intersect(SG(y1y2(1)).neighbors, SG(y1y2(2)).neighbors, 'rows');
+                    for m = 1 : 2
+                        t = x3b(m,:);
+                        if t(1) == t(end)
+                            fx3 = old(GraphApprox.lookup(SGprev,level-1,t(1:end-1)));
+                        end
+                    end
+                    fy0 = ((4 - eigenvalue) * (fx1x2(1) + fx1x2(2)) + 2 * fx3)/((2 - eigenvalue)*(5 - eigenvalue));
+                    expand(1,j) = fy0;
+                end
+            end
+        end
+        
+        function result = Expand(level, old, varargin)
+            result{1} = [];
+            result{2} = [];
+            result{3} = old{3};
+            if nargin == 2 
+            for i = 1 : length(old{2})
+                ev = old{2}(i);
+                evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                newplus = SpectralDecimation.Continued(level, evplus, old{1}(1:end,i)');
+                newminus = SpectralDecimation.Continued(level, evminus, old{1}(1:end,i)');
+                if evplus ~= 2 && evplus ~= 5
+                    result{2} = [result{2}, evplus];
+                    result{1} = [result{1}, newplus'];
+                end
+                if evminus ~= 2 && evminus ~= 5
+                    result{2} = [result{2}, evminus];
+                    result{1} = [result{1}, newminus'];
+                end
+            end
+            else
+                seq = varargin{1};
+                for i = 1 : length(seq)
+                    ev = old{2}(i);
+                    if seq(i) >= 0
+                        evnew = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    else
+                        evnew = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    end
+                    new = SpectralDecimation.Continued(level, evnew, old{1}(1:end,i)');
+                    if evnew ~= 2 && evnew ~= 5
+                        result{2} = [result{2}, evnew];
+                        result{1} = [result{1}, new'];
+                    end
+                end
+            end
+        end
+        
+        function result = Eigenfunctions(level)
+            result = SpectralDecimation.Initial(level);
+            if level > 1
+                old = SpectralDecimation.Eigenfunctions(level - 1);
+                for i = 1 : length(old.eigenvalues)
+                    ev = old.eigenvalues(i);
+                    evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    newplus = SpectralDecimation.Continued(level, evplus, old.x(1:end,i)');
+                    newminus = SpectralDecimation.Continued(level, evminus, old.x(1:end,i)');
+                    if evplus ~= 2 && evplus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evplus];
+                        result.x = [result.x, newplus'];
+                    end
+                    if evminus ~= 2 && evminus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evminus];
+                        result.x = [result.x, newminus'];
+                    end
+                    
+                end
+            end
+        end
+    end
+end
+##### SOURCE END #####
+--></body></html>

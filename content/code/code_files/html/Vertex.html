@@ -1,0 +1,401 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Vertex</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-25"><meta name="DC.source" content="Vertex.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> Vertex
+    <span class="comment">%VERTEX For vertices in \Gamma_m</span>
+
+    <span class="keyword">properties</span> (SetAccess = private)
+        level      <span class="comment">% Level of fineness (this is m in \Gamma_m)</span>
+        address    <span class="comment">% A word of length m (row vector)</span>
+        neighbors  <span class="comment">% A vector of addresses of its neighbors</span>
+        xycoords   <span class="comment">% Coordinates in the Cartesian plane</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span> (Static)
+
+        <span class="keyword">function</span> point = Primary(point)
+            <span class="comment">%GET_PRIMARY Returns primary address</span>
+            <span class="comment">%   Passthrough if primary already</span>
+            <span class="comment">%   Twin to get_secondary()</span>
+            <span class="comment">%   Given $F_wq_i$ with $\left|w\right| = m$, the other address</span>
+            <span class="comment">%   can be found using the following procedure.</span>
+            <span class="comment">%   Let $n$ be the least integer such that $w_k = i$ for all</span>
+            <span class="comment">%   $n &lt; k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,</span>
+            <span class="comment">%   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).</span>
+            q = point(1);
+            <span class="keyword">for</span> i = length(point):-1:2
+                <span class="keyword">if</span> point(i) &lt; q  <span class="comment">% Different and currently secondary</span>
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    <span class="keyword">return</span>
+                <span class="keyword">elseif</span> point(i) &gt; q  <span class="comment">% Different but already primary</span>
+                    <span class="keyword">return</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> point = Secondary(point)
+            <span class="comment">%GET_SECONDARY Returns secondary address</span>
+            <span class="comment">%   Passthrough if secondary already</span>
+            <span class="comment">%   Twin to get_primary()</span>
+            <span class="comment">%   Given $F_wq_i$ with $\left|w\right| = m$, the other address</span>
+            <span class="comment">%   can be found using the following procedure.</span>
+            <span class="comment">%   Let $n$ be the least integer such that $w_k = i$ for all</span>
+            <span class="comment">%   $n &lt; k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,</span>
+            <span class="comment">%   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).</span>
+            q = point(1);
+            <span class="keyword">for</span> i = length(point):-1:2
+                <span class="keyword">if</span> point(i) &gt; q  <span class="comment">% Different and currently primary</span>
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    <span class="keyword">return</span>
+                <span class="keyword">elseif</span> point(i) &lt; q  <span class="comment">% Different but already secondary</span>
+                    <span class="keyword">return</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+
+        <span class="keyword">function</span> self = Vertex(address)
+            <span class="comment">%VERTEX Construct an instance of this class</span>
+            <span class="comment">%   Input should be a valid address; no error checking (yet?)</span>
+            self.level = length(address)-1;  <span class="comment">% Off-by-one ugh.</span>
+            self.address = address;
+            self.address = self.get_primary();
+            self = self.set_neighbors();
+            <span class="comment">%TODO No need, this is done in set_neighbors() already</span>
+            <span class="comment">%[numnbrs, ~] = size(self.neighbors);</span>
+            <span class="comment">%for i = 1:numnbrs</span>
+            <span class="comment">%    self.neighbors(i,1:end) = self.Primary(self.neighbors(i,1:end));</span>
+            <span class="comment">%end</span>
+            self = self.set_xycoords();
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> prim = get_primary(self)
+            point = self.address;
+            prim = self.Primary(point);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> sec = get_secondary(self)
+            point = self.address;
+            sec = self.Secondary(point);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> self = set_neighbors(self)
+            <span class="comment">%SET_NEIGHBORS Updates addresses of neighbors of self</span>
+
+            <span class="keyword">if</span> all(self.address == self.address(1))
+                <span class="comment">% Case 1: self is a boundary point</span>
+                <span class="comment">% Then it has only 2 neighbors</span>
+                <span class="keyword">if</span> self.address(1) == 0
+                    self.neighbors = [[self.address(1:end-1) 1];
+                        [self.address(1:end-1) 2]];
+                <span class="keyword">elseif</span> self.address(1) == 1
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% self.address(1) == 2</span>
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 1]];
+                <span class="keyword">end</span>
+            <span class="keyword">else</span>
+                <span class="comment">% Case 2: self is not a boundary point</span>
+                <span class="comment">% Then it has 4 neighbors</span>
+                <span class="comment">% 2 of them come from one cell</span>
+                primary = self.get_primary();
+                <span class="keyword">if</span> primary(end) == 0
+                    self.neighbors = [[primary(1:end-1) 1];
+                        [primary(1:end-1) 2]];
+                <span class="keyword">elseif</span> primary(end) == 1
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% primary(end) == 2</span>
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 1]];
+                <span class="keyword">end</span>
+                <span class="comment">% The other 2 come from another cell</span>
+                secondary = self.get_secondary();
+                <span class="keyword">if</span> secondary(end) == 0
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 1];
+                        [secondary(1:end-1) 2]];
+                <span class="keyword">elseif</span> secondary(end) == 1
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% secondary(end) == 2</span>
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 1]];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% Convert all neighbors' addresses to primary version</span>
+            <span class="keyword">for</span> i = 1:size(self.neighbors, 1)
+                self.neighbors(i, :) = Vertex.Primary(self.neighbors(i, :));
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> self = set_xycoords(self)
+            <span class="comment">%SET_NEIGHBORS Updates addresses of neighbors of self</span>
+            <span class="comment">% Start at a boundary point</span>
+            q = [[0.5, 3^0.5/2];
+                [0, 0];
+                [1, 0]];
+            self.xycoords = q(self.address(1)+1, :);  <span class="comment">% Off-by-one again</span>
+            <span class="comment">% Apply IFS based on address of vertex</span>
+            self.xycoords = ApplyIFS_2D(self.xycoords, self.address(2:end));
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> draw(self, side)
+            <span class="comment">%DRAW Draws the vertex in xy-plane</span>
+            <span class="comment">%   side controls the side length of the bounding triangle</span>
+            <span class="comment">%   Assumes that a figure window is already open and hold is on</span>
+            coords = self.xycoords * side;
+            plot(coords(1), coords(2), <span class="string">'.r'</span>)
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in Vertex (line 64)
+            self.level = length(address)-1;  % Off-by-one ugh.
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+classdef Vertex
+    %VERTEX For vertices in \Gamma_m
+
+    properties (SetAccess = private)
+        level      % Level of fineness (this is m in \Gamma_m)
+        address    % A word of length m (row vector)
+        neighbors  % A vector of addresses of its neighbors
+        xycoords   % Coordinates in the Cartesian plane
+    end
+
+    methods (Static)
+
+        function point = Primary(point)
+            %GET_PRIMARY Returns primary address
+            %   Passthrough if primary already
+            %   Twin to get_secondary()
+            %   Given $F_wq_i$ with $\left|w\right| = m$, the other address
+            %   can be found using the following procedure.
+            %   Let $n$ be the least integer such that $w_k = i$ for all
+            %   $n < k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,
+            %   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).
+            q = point(1);
+            for i = length(point):-1:2
+                if point(i) < q  % Different and currently secondary
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    return
+                elseif point(i) > q  % Different but already primary
+                    return
+                end
+            end
+        end
+
+        function point = Secondary(point)
+            %GET_SECONDARY Returns secondary address
+            %   Passthrough if secondary already
+            %   Twin to get_primary()
+            %   Given $F_wq_i$ with $\left|w\right| = m$, the other address
+            %   can be found using the following procedure.
+            %   Let $n$ be the least integer such that $w_k = i$ for all
+            %   $n < k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,
+            %   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).
+            q = point(1);
+            for i = length(point):-1:2
+                if point(i) > q  % Different and currently primary
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    return
+                elseif point(i) < q  % Different but already secondary
+                    return
+                end
+            end
+        end
+
+    end
+
+    methods
+
+        function self = Vertex(address)
+            %VERTEX Construct an instance of this class
+            %   Input should be a valid address; no error checking (yet?)
+            self.level = length(address)-1;  % Off-by-one ugh.
+            self.address = address;
+            self.address = self.get_primary();
+            self = self.set_neighbors();
+            %TODO No need, this is done in set_neighbors() already
+            %[numnbrs, ~] = size(self.neighbors);
+            %for i = 1:numnbrs
+            %    self.neighbors(i,1:end) = self.Primary(self.neighbors(i,1:end));
+            %end
+            self = self.set_xycoords();
+        end
+
+        function prim = get_primary(self)
+            point = self.address;
+            prim = self.Primary(point);
+        end
+
+        function sec = get_secondary(self)
+            point = self.address;
+            sec = self.Secondary(point);
+        end
+
+        function self = set_neighbors(self)
+            %SET_NEIGHBORS Updates addresses of neighbors of self
+
+            if all(self.address == self.address(1))
+                % Case 1: self is a boundary point
+                % Then it has only 2 neighbors
+                if self.address(1) == 0
+                    self.neighbors = [[self.address(1:end-1) 1];
+                        [self.address(1:end-1) 2]];
+                elseif self.address(1) == 1
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 2]];
+                else  % self.address(1) == 2
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 1]];
+                end
+            else
+                % Case 2: self is not a boundary point
+                % Then it has 4 neighbors
+                % 2 of them come from one cell
+                primary = self.get_primary();
+                if primary(end) == 0
+                    self.neighbors = [[primary(1:end-1) 1];
+                        [primary(1:end-1) 2]];
+                elseif primary(end) == 1
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 2]];
+                else  % primary(end) == 2
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 1]];
+                end
+                % The other 2 come from another cell
+                secondary = self.get_secondary();
+                if secondary(end) == 0
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 1];
+                        [secondary(1:end-1) 2]];
+                elseif secondary(end) == 1
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 2]];
+                else  % secondary(end) == 2
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 1]];
+                end
+            end
+
+            % Convert all neighbors' addresses to primary version
+            for i = 1:size(self.neighbors, 1)
+                self.neighbors(i, :) = Vertex.Primary(self.neighbors(i, :));
+            end
+
+        end
+        
+        function self = set_xycoords(self)
+            %SET_NEIGHBORS Updates addresses of neighbors of self
+            % Start at a boundary point
+            q = [[0.5, 3^0.5/2];
+                [0, 0];
+                [1, 0]];
+            self.xycoords = q(self.address(1)+1, :);  % Off-by-one again
+            % Apply IFS based on address of vertex
+            self.xycoords = ApplyIFS_2D(self.xycoords, self.address(2:end));
+        end
+        
+        function draw(self, side)
+            %DRAW Draws the vertex in xy-plane
+            %   side controls the side length of the bounding triangle
+            %   Assumes that a figure window is already open and hold is on
+            coords = self.xycoords * side;
+            plot(coords(1), coords(2), '.r')
+        end
+        
+    end
+    
+end
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,287 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>EF</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-25"><meta name="DC.source" content="EF.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">classdef</span> EF
+
+    <span class="keyword">methods</span> (Static)
+
+        <span class="keyword">function</span> is_eigen = EigenfunctionCheck(level, eigenvalue, eigenfunction)
+            <span class="comment">% EIGENFUNCTIONCHECK returns true if eigenfunction is an</span>
+            <span class="comment">% eigenfunction of the laplacian with the given eigenvalue.</span>
+            <span class="comment">% Eigenfunction must be a row vector of length equal to the</span>
+            <span class="comment">% number of vertices in Gamma_level.</span>
+            gamma = GraphApprox(level);
+            npts = length(gamma.vertices);
+            lapl = GLaplacian(gamma, eigenfunction);
+            laplpar = lapl(4:npts);
+            is_eigen = norm(laplpar+eigenvalue*eigenfunction(4:npts)) &lt; 0.001;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> ok = EigenfunctionsCheck(efs, evs)
+            <span class="comment">%EIGENFUNCTIONSCHECK returns true if each row of efs matrix is</span>
+            <span class="comment">%an eigenfunction of the laplacian with the eigenvalue equal to</span>
+            <span class="comment">%the corresponding entry of evs (a column vector).</span>
+            [n, plevel] = size(efs);
+            level = int8( log(2*plevel-3)/log(3) - 1 );
+            arr = zeros(1, n);
+            <span class="keyword">for</span> i = 1:n
+                arr(i) = EF.EigenfunctionCheck(level, evs(i, 1), efs(i, :));
+            <span class="keyword">end</span>
+            ok = all(arr);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> eigenfunctions = Eigenfunctions(level, eigenvalue)
+            <span class="comment">% EIGENFUNCTIONS(l, e) is the list of Dirichlet eigenfunctions with</span>
+            <span class="comment">% eigenvalue e on SG approximation of level l</span>
+            npts = length(GraphApprox(level).vertices);
+            syms <span class="string">x</span> <span class="string">[1 npts]</span>;
+            laplvar = GLaplacian(GraphApprox(level), x);
+            laplparvar = laplvar(4:npts);
+            eigenfunctions = solve([laplparvar == -sym(eigenvalue)*x(4:npts), x(1:3) == [0 0 0], norm(x)^2 ~= 0], x, <span class="string">'ReturnCondition'</span>, true);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func, list] = Shrink(old, level, vertex)
+            <span class="comment">%SHRINK reproduces old - a function on Gamma_n - on the 1-cell</span>
+            <span class="comment">%adjacent to the given vertex of Gamma_{n+1}</span>
+            <span class="comment">%(where level must be equal to n+1)</span>
+            graphNew = GraphApprox(level).vertices;
+            graphOld = GraphApprox(level-1).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list = zeros([1,(3^(level+1)+3)/2]);
+            <span class="keyword">for</span> i = 1 : (3^level+3)/2
+                oldAddress = graphOld(i).address;
+                newAddress = Vertex.Primary([oldAddress(1), vertex, oldAddress(2:end)]);
+                j = GraphApprox.lookup(graphNew, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = ShrinkAll(old, level, vertex)
+            <span class="comment">%SHRINKALL applies Shrink to several functions (represented as</span>
+            <span class="comment">% columns of the matrix old). All functions are shrunk to the</span>
+            <span class="comment">% same 1-cell given by vertex.</span>
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            <span class="keyword">for</span> i = 1:num
+                [func, list] = EF.Shrink(old{1}(1:end,i)', level, vertex);
+                new{1}(1:length,i) = func(1:length)';
+            <span class="keyword">end</span>
+            new{2} = old{2};
+            new{3} = list(old{3});
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func, list] = Reflect(old, level, vertices)
+            graph = GraphApprox(level).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list  = zeros([1,(3^(level+1)+3)/2]);
+            <span class="keyword">for</span> i = 1 : (3^(level+1)+3)/2
+                oldAddress = graph(i).address;
+                newAddress = oldAddress;
+                newAddress(oldAddress == vertices(1)) = vertices(2);
+                newAddress(oldAddress == vertices(2)) = vertices(1);
+                newAddress = Vertex.Primary(newAddress);
+                j = GraphApprox.lookup(graph, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func,list] = ExtendLocal(old, level, vertices)
+            [func1, list] = EF.Shrink(old, level, vertices(1));
+            func2 = EF.Shrink(EF.Reflect(old, level-1,vertices), level, vertices(2));
+            func = func1-func2;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = ExtendAll(old, level, vertices)
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            <span class="keyword">for</span> i = 1:num
+                [func, list] = EF.ExtendLocal(old{1}(1:end,i)', level, vertices);
+                new{1}(1:length,i) = func(1:length)';
+            <span class="keyword">end</span>
+            new{2} = old{2};
+            new{3} = list(old{3});
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput">
+ans = 
+
+  EF with no properties.
+
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+classdef EF
+    
+    methods (Static)
+        
+        function is_eigen = EigenfunctionCheck(level, eigenvalue, eigenfunction)
+            % EIGENFUNCTIONCHECK returns true if eigenfunction is an
+            % eigenfunction of the laplacian with the given eigenvalue.
+            % Eigenfunction must be a row vector of length equal to the
+            % number of vertices in Gamma_level.
+            gamma = GraphApprox(level);
+            npts = length(gamma.vertices);
+            lapl = GLaplacian(gamma, eigenfunction);
+            laplpar = lapl(4:npts);
+            is_eigen = norm(laplpar+eigenvalue*eigenfunction(4:npts)) < 0.001;
+        end
+        
+        function ok = EigenfunctionsCheck(efs, evs)
+            %EIGENFUNCTIONSCHECK returns true if each row of efs matrix is
+            %an eigenfunction of the laplacian with the eigenvalue equal to
+            %the corresponding entry of evs (a column vector).
+            [n, plevel] = size(efs);
+            level = int8( log(2*plevel-3)/log(3) - 1 );
+            arr = zeros(1, n);
+            for i = 1:n
+                arr(i) = EF.EigenfunctionCheck(level, evs(i, 1), efs(i, :));
+            end
+            ok = all(arr);
+        end
+        
+        function eigenfunctions = Eigenfunctions(level, eigenvalue)
+            % EIGENFUNCTIONS(l, e) is the list of Dirichlet eigenfunctions with
+            % eigenvalue e on SG approximation of level l
+            npts = length(GraphApprox(level).vertices);
+            syms x [1 npts];
+            laplvar = GLaplacian(GraphApprox(level), x);
+            laplparvar = laplvar(4:npts);
+            eigenfunctions = solve([laplparvar == -sym(eigenvalue)*x(4:npts), x(1:3) == [0 0 0], norm(x)^2 ~= 0], x, 'ReturnCondition', true);
+        end
+        
+        function [func, list] = Shrink(old, level, vertex)
+            %SHRINK reproduces old - a function on Gamma_n - on the 1-cell
+            %adjacent to the given vertex of Gamma_{n+1}
+            %(where level must be equal to n+1)
+            graphNew = GraphApprox(level).vertices;
+            graphOld = GraphApprox(level-1).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list = zeros([1,(3^(level+1)+3)/2]);
+            for i = 1 : (3^level+3)/2
+                oldAddress = graphOld(i).address;
+                newAddress = Vertex.Primary([oldAddress(1), vertex, oldAddress(2:end)]);
+                j = GraphApprox.lookup(graphNew, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            end
+        end
+        
+        function new = ShrinkAll(old, level, vertex)
+            %SHRINKALL applies Shrink to several functions (represented as
+            % columns of the matrix old). All functions are shrunk to the
+            % same 1-cell given by vertex.
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            for i = 1:num
+                [func, list] = EF.Shrink(old{1}(1:end,i)', level, vertex);
+                new{1}(1:length,i) = func(1:length)';
+            end
+            new{2} = old{2};
+            new{3} = list(old{3});
+        end
+        
+        function [func, list] = Reflect(old, level, vertices)
+            graph = GraphApprox(level).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list  = zeros([1,(3^(level+1)+3)/2]);
+            for i = 1 : (3^(level+1)+3)/2
+                oldAddress = graph(i).address;
+                newAddress = oldAddress;
+                newAddress(oldAddress == vertices(1)) = vertices(2);
+                newAddress(oldAddress == vertices(2)) = vertices(1);
+                newAddress = Vertex.Primary(newAddress);
+                j = GraphApprox.lookup(graph, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            end
+        end
+        
+        function [func,list] = ExtendLocal(old, level, vertices)
+            [func1, list] = EF.Shrink(old, level, vertices(1));
+            func2 = EF.Shrink(EF.Reflect(old, level-1,vertices), level, vertices(2));
+            func = func1-func2;
+        end
+        
+        function new = ExtendAll(old, level, vertices)
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            for i = 1:num
+                [func, list] = EF.ExtendLocal(old{1}(1:end,i)', level, vertices);
+                new{1}(1:length,i) = func(1:length)';
+            end
+            new{2} = old{2};
+            new{3} = list(old{3});
+        end
+    end
+end
+
+
+##### SOURCE END #####
+--></body></html>
