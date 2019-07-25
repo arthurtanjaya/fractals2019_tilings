@@ -10,6 +10,7 @@
             SPUR 2019: Tilings on SG
         </title>
         <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/latex.css">
         <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
                 tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
@@ -41,7 +42,7 @@
             Introduction
         </h2>
         <p>
-            The aim of this Cornell SPUR project is to study tilings on the Sierpinski gasket and its blow-ups. TODO
+            The aim of this Cornell SPUR project is to study tilings on the Sierpinski gasket and its blow-ups.
         </p>
         <h2>
             Project description
@@ -55,30 +56,22 @@
         <p>
             Although Fuglede's conjecture has been shown to be false in both directions, there are many special cases where it is known to be true, and this has led to a lot of interesting research. We would like to explore related problems on SG.
         </p>
-        <p>
-            \begin{question}
+        <div class="question">
             Consider a discrete approximation to $\text{SG}_n$, and let $A \subseteq \text{SG}_n$. When does there exist a set of translations $T$ such that
             \[
             \text{SG}_n = \bigsqcup_{\tau_k \in T}(A + \tau_k)?
             \]
-            \end{question}
-        </p>
-        <p>
-            \begin{problem}
+        </div>
+        <div class="problem">
             Find an algorithm that gives all such tilings by translations.
-            \end{problem}
-        </p>
-        <p>
-            \begin{question}
+        </div>
+        <div class="question">
             Again given $A \subseteq \text{SG}_n$, does there exist an orthonomal basis of functions $\{\varphi_j\}$ on $\ell^2(A)$ such that each $\varphi_j$ has an extension $\widetilde{\varphi}_j$ on $\text{SG}_n$ satisfying an eigenvalue equation
             $-\Delta_n \widetilde{\varphi}_j = \lambda_{n, j} \widetilde{\varphi}_j$ on $\text{SG}_n$?
-            \end{question}
-        </p>
-        <p>
-            \begin{problem}
+        </div>
+        <div class="problem">
             Find an algorithm that yields all such exponential bases.
-            \end{problem}
-        </p>
+        </div>
         <p class="footer">
             <br>
             <h2>

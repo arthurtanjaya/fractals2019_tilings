@@ -1,0 +1,86 @@
+.theorem {
+    display: block;
+    margin: 12px 0;
+    font-style: italic;
+}
+.theorem:before {
+    content: "Theorem.";
+    font-weight: bold;
+    font-style: normal;
+}
+.theorem[text]:before {
+    content: "Theorem (" attr(text) ").";
+}
+
+.lemma {
+    display: block;
+    margin: 12px 0;
+    font-style: italic;
+}
+.lemma:before {
+    content: "Lemma.";
+    font-weight: bold;
+    font-style: normal;
+}
+.lemma[text]:before {
+    content: "Lemma (" attr(text) ").";
+}
+
+.proof {
+    display: block;
+    margin: 12px 0;
+    font-style: normal;
+}
+.proof:before {
+    content: "Proof.";
+    font-style: italic;
+}
+.proof[text]:before {
+    content: attr(text) ".";
+}
+.proof:after {
+    content: "\25fc";
+    text-align: right;
+}
+
+.definition {
+    display: block;
+    margin: 12px 0;
+    font-style: normal;
+}
+.definition:before {
+    content: "Definition.";
+    font-weight: bold;
+    font-style: normal;
+}
+.definition[text]:before {
+    content: "Definition (" attr(text) ").";
+}
+
+.problem {
+    display: block;
+    margin: 12px 0;
+    font-style: normal;
+}
+.problem:before {
+    content: "Problem.";
+    font-weight: bold;
+    font-style: normal;
+}
+.problem[text]:before {
+    content: "Problem (" attr(text) ").";
+}
+
+.question {
+    display: block;
+    margin: 12px 0;
+    font-style: normal;
+}
+.question:before {
+    content: "Question.";
+    font-weight: bold;
+    font-style: normal;
+}
+.question[text]:before {
+    content: "Question (" attr(text) ").";
+}
