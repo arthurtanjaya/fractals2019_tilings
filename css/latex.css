@@ -2,6 +2,7 @@
     display: block;
     margin: 12px 0;
     font-style: italic;
+    text-align: justify;
 }
 .theorem:before {
     content: "Theorem.";
@@ -16,6 +17,7 @@
     display: block;
     margin: 12px 0;
     font-style: italic;
+    text-align: justify;
 }
 .lemma:before {
     content: "Lemma.";
@@ -30,6 +32,7 @@
     display: block;
     margin: 12px 0;
     font-style: normal;
+    text-align: justify;
 }
 .proof:before {
     content: "Proof.";
@@ -47,6 +50,7 @@
     display: block;
     margin: 12px 0;
     font-style: normal;
+    text-align: justify;
 }
 .definition:before {
     content: "Definition.";
@@ -61,6 +65,7 @@
     display: block;
     margin: 12px 0;
     font-style: normal;
+    text-align: justify;
 }
 .problem:before {
     content: "Problem.";
@@ -75,6 +80,7 @@
     display: block;
     margin: 12px 0;
     font-style: normal;
+    text-align: justify;
 }
 .question:before {
     content: "Question.";
