@@ -1,10 +1,10 @@
 .topnav {
     background-color: #222222;
     overflow: hidden;
+    margin: -8px; /* Default margin on html body is 8px */
 }
 
 .topnav a {
-    float: left;
     color: #f7f7f7;
     text-align: center;
     padding: 14px 16px;
@@ -83,7 +83,6 @@ html {
 
 html body {
     height: 100%;
-    margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     color: #000;
