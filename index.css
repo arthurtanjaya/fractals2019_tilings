@@ -12,12 +12,12 @@
     font-size: 17px;
 }
 
-.topnav a:hover {
-    color: white;
+.topnav a.active {
+    background-color: #b31b1b;
 }
 
-.topnav a.active {
-    background-color: red;
+.topnav a:hover {
+    color: #A2998B;
 }
 
 img {
