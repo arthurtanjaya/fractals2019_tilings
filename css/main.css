@@ -1,8 +1,9 @@
 .topnav {
     background-color: #222222;
     overflow: hidden;
-    margin: -8px; /* Default margin on html body is 8px */
-    padding: 12px; /* By experiment */
+    margin: -8px;
+    padding: 12px;
+
 }
 
 .topnav a {
@@ -19,6 +20,31 @@
 
 .topnav a:hover {
     color: #a2998b;
+}
+
+.sidenav {
+    height: 100%;
+    width: 160px;
+    position: fixed;
+    z-index: 0;
+    top: 0;
+    left: 0;
+    margin-top: 47px;
+    background-color: #4c4c4c;
+    overflow-x: hidden;
+    padding-top: 20px;
+}
+
+.sidenav a {
+    padding: 6px 8px 6px 16px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+}
+
+.sidenav a:hover {
+    color: #b31b1b;
 }
 
 img {
@@ -118,55 +144,6 @@ a:visited {
     text-decoration: underline;
     cursor: auto;
 }
-
-/*
-    h1 {
-        padding: 0;
-        margin: 0 0 25px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 1.5em;
-        color: #d55000;
-        line-height: 100%;
-        font-weight: normal;
-    }
-
-    h2 {
-        padding: 0;
-        margin: 0 0 8px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 1.2em;
-        color: #000;
-        font-weight: bold;
-        line-height: 140%;
-        border-bottom: 1px solid #d6d4d4;
-        display: block;
-    }
-
-    h3 {
-        padding: 0;
-        margin: 0 0 5px;
-        font-family: Arial, Helvetica, sans-serif;
-        font-size: 1.1em;
-        color: #000;
-        font-weight: bold;
-        line-height: 140%;
-    }
-
-    a {
-        color: #005fce;
-        text-decoration: none;
-    }
-
-    a:hover {
-        color: #005fce;
-        text-decoration: underline;
-    }
-
-    a:visited {
-        color: #004aa0;
-        text-decoration: none;
-    }
-*/
 
 p {
     padding: 0;

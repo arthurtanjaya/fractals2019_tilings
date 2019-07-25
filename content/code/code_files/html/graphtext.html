@@ -1,0 +1,250 @@
+
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>graphtext</title><meta name="generator" content="MATLAB 9.6"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2019-07-25"><meta name="DC.source" content="graphtext.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput"><span class="keyword">function</span> [] = graphtext(level,z_vals, tile, num, varargin)
+<span class="comment">%takes a row vector of column vectors</span>
+<span class="comment">%each column vector is a standard address with a z-value appended on the</span>
+<span class="comment">%end</span>
+g = GraphApprox(level);
+plotting_points = zeros([level+1, (3^(level+1)+3)/2]);
+<span class="keyword">for</span> i = 1:(3^(level+1)+3)/2
+    plotting_points(1:end,i) = g.vertices(i).address';
+<span class="keyword">end</span>
+<span class="comment">%gasketdata = [plotting_points; z_vals];</span>
+gasketdata = plotting_points;
+<span class="comment">%declaring empty output</span>
+X = zeros(length(gasketdata),1);
+Y = zeros(length(gasketdata),1);
+<span class="comment">%defining IFS</span>
+f2 = @(x) 1/2*(x-[0.5,sqrt(3)]) + [0.5,sqrt(3)];
+f1 = @(x) 1/2*(x-[1,0]) + [1,0];
+f0 = @(x) 1/2*(x-[0,0]);
+<span class="comment">%for each point...</span>
+<span class="keyword">for</span> i = 1:length(gasketdata)
+    <span class="comment">%find the proper qi...</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 0
+        cartesian = [0,0];
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 1
+        cartesian = [1,0];
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 2
+        cartesian = [0.5,sqrt(3)];
+    <span class="keyword">end</span>
+    <span class="comment">%...and iterate the funciton maps to get the actual point</span>
+    <span class="keyword">for</span> j = length(gasketdata(:,i)):-1:2
+        <span class="keyword">if</span> gasketdata(j,i) == 0
+            cartesian = f0(cartesian);
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> gasketdata(j,i) == 1
+            cartesian = f1(cartesian);
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> gasketdata(j,i) == 2
+            cartesian = f2(cartesian);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">%insert this x,y,z triple into the cartesian vectors for output</span>
+    X(i,1) = cartesian(1);
+    Y(i,1) = cartesian(2);
+    Z(i,1) = z_vals(i);
+<span class="keyword">end</span>
+hold <span class="string">on</span>
+scatter(X,Y,<span class="string">'.r'</span>)
+<span class="keyword">for</span> i = tile
+    tileX = X(tile);
+    tileY = Y(tile);
+    scatter(tileX,tileY, <span class="string">'r'</span>, <span class="string">'filled'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">%Z = 1:(3^(level+1)+3)/2;</span>
+<span class="keyword">if</span> num
+    nonzeroX = X(Z ~= 0);
+    nonzeroY = Y(Z ~= 0);
+    nonzeroZ = Z(Z ~= 0);
+    text(nonzeroX,nonzeroY+0.05,num2str(double(nonzeroZ)), <span class="string">'FontSize'</span>, 15)
+<span class="keyword">else</span>
+    text(X+0.01,Y+0.06,Z,<span class="string">'FontSize'</span>, 15)
+<span class="keyword">end</span>
+[numedges, ~] = size(g.edges);
+<span class="keyword">for</span>  i = 1:numedges
+    Xedge = X(g.edges(i,1:2));
+    Yedge = Y(g.edges(i,1:2));
+    plot(Xedge, Yedge, <span class="string">'k'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> nargin &gt; 4
+    <span class="keyword">for</span> i = 5:nargin
+        data = varargin{i-4};
+        <span class="keyword">if</span> data{1} == <span class="string">"p"</span>
+            plot(data{2:end});
+        <span class="keyword">else</span>
+            text(data{2:end}, <span class="string">'FontSize'</span>, 15);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+    ax = gca;
+    ax.XColor = <span class="string">'none'</span>;
+    ax.YColor = <span class="string">'none'</span>;
+
+    hold <span class="string">off</span>
+<span class="keyword">end</span>
+</pre><pre class="codeoutput error">Not enough input arguments.
+
+Error in graphtext (line 5)
+g = GraphApprox(level);
+</pre><p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+function [] = graphtext(level,z_vals, tile, num, varargin)
+%takes a row vector of column vectors
+%each column vector is a standard address with a z-value appended on the
+%end
+g = GraphApprox(level);
+plotting_points = zeros([level+1, (3^(level+1)+3)/2]);
+for i = 1:(3^(level+1)+3)/2
+    plotting_points(1:end,i) = g.vertices(i).address';
+end
+%gasketdata = [plotting_points; z_vals];
+gasketdata = plotting_points;
+%declaring empty output
+X = zeros(length(gasketdata),1);
+Y = zeros(length(gasketdata),1);
+%defining IFS
+f2 = @(x) 1/2*(x-[0.5,sqrt(3)]) + [0.5,sqrt(3)];
+f1 = @(x) 1/2*(x-[1,0]) + [1,0];
+f0 = @(x) 1/2*(x-[0,0]);
+%for each point...
+for i = 1:length(gasketdata)
+    %find the proper qi...
+    if gasketdata(1,i) == 0
+        cartesian = [0,0];
+    end
+    if gasketdata(1,i) == 1
+        cartesian = [1,0];
+    end
+    if gasketdata(1,i) == 2
+        cartesian = [0.5,sqrt(3)];
+    end
+    %...and iterate the funciton maps to get the actual point
+    for j = length(gasketdata(:,i)):-1:2
+        if gasketdata(j,i) == 0
+            cartesian = f0(cartesian);
+        end
+        if gasketdata(j,i) == 1
+            cartesian = f1(cartesian);
+        end
+        if gasketdata(j,i) == 2
+            cartesian = f2(cartesian);
+        end
+    end
+    %insert this x,y,z triple into the cartesian vectors for output
+    X(i,1) = cartesian(1);
+    Y(i,1) = cartesian(2);
+    Z(i,1) = z_vals(i);
+end
+hold on
+scatter(X,Y,'.r')
+for i = tile
+    tileX = X(tile);
+    tileY = Y(tile);
+    scatter(tileX,tileY, 'r', 'filled');
+end
+
+%Z = 1:(3^(level+1)+3)/2;
+if num
+    nonzeroX = X(Z ~= 0);
+    nonzeroY = Y(Z ~= 0);
+    nonzeroZ = Z(Z ~= 0);
+    text(nonzeroX,nonzeroY+0.05,num2str(double(nonzeroZ)), 'FontSize', 15)
+else
+    text(X+0.01,Y+0.06,Z,'FontSize', 15)
+end
+[numedges, ~] = size(g.edges);
+for  i = 1:numedges
+    Xedge = X(g.edges(i,1:2));
+    Yedge = Y(g.edges(i,1:2));
+    plot(Xedge, Yedge, 'k');
+end
+
+if nargin > 4
+    for i = 5:nargin
+        data = varargin{i-4};
+        if data{1} == "p"
+            plot(data{2:end});
+        else
+            text(data{2:end}, 'FontSize', 15);
+        end
+    end
+end 
+    ax = gca;
+    ax.XColor = 'none';
+    ax.YColor = 'none';
+    
+    hold off
+end
+##### SOURCE END #####
+--></body></html>
