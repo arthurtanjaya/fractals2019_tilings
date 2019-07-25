@@ -84,7 +84,7 @@ html {
 
 html body {
     height: 100%;
-    margin: 0px;
+    margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 16px;
     color: #000;
@@ -122,8 +122,8 @@ a:visited {
 
 /*
     h1 {
-        padding: 0px;
-        margin: 0px 0px 25px;
+        padding: 0;
+        margin: 0 0 25px;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 1.5em;
         color: #d55000;
@@ -132,8 +132,8 @@ a:visited {
     }
 
     h2 {
-        padding: 0px;
-        margin: 0px 0px 8px;
+        padding: 0;
+        margin: 0 0 8px;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 1.2em;
         color: #000;
@@ -144,8 +144,8 @@ a:visited {
     }
 
     h3 {
-        padding: 0px;
-        margin: 0px 0px 5px;
+        padding: 0;
+        margin: 0 0 5px;
         font-family: Arial, Helvetica, sans-serif;
         font-size: 1.1em;
         color: #000;
@@ -170,34 +170,34 @@ a:visited {
 */
 
 p {
-    padding: 0px;
-    margin: 0px 0px 20px;
+    padding: 0;
+    margin: 0 0 20px;
 }
 
 img {
-    padding: 0px;
-    margin: 0px 0px 20px;
+    padding: 0;
+    margin: 0 0 20px;
     border: none;
 }
 
 p img, pre img, tt img, li img, h1 img, h2 img {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 ul {
-    padding: 0px;
-    margin: 0px 0px 20px 23px;
+    padding: 0;
+    margin: 0 0 20px 23px;
     list-style: square;
 }
 
 ul li {
-    padding: 0px;
-    margin: 0px 0px 7px 0px;
+    padding: 0;
+    margin: 0 0 7px 0;
 }
 
 ul li ul {
-    padding: 5px 0px 0px;
-    margin: 0px 0px 7px 23px;
+    padding: 5px 0 0;
+    margin: 0 0 7px 23px;
 }
 
 ul li ol li {
@@ -205,20 +205,20 @@ ul li ol li {
 }
 
 ol {
-    padding: 0px;
-    margin: 0px 0px 20px 0px;
+    padding: 0;
+    margin: 0 0 20px 0;
     list-style: decimal;
 }
 
 ol li {
-    padding: 0px;
-    margin: 0px 0px 7px 23px;
+    padding: 0;
+    margin: 0 0 7px 23px;
     list-style-type: decimal;
 }
 
 ol li ol {
-    padding: 5px 0px 0px;
-    margin: 0px 0px 7px 0px;
+    padding: 5px 0 0;
+    margin: 0 0 7px 0;
 }
 
 ol li ol li {
@@ -248,7 +248,7 @@ tt {
 }
 
 pre {
-    margin: 0px 0px 20px;
+    margin: 0 0 20px;
 }
 
 pre.codeinput {
@@ -259,7 +259,7 @@ pre.codeinput {
 
 pre.codeoutput {
     padding: 10px 11px;
-    margin: 0px 0px 20px;
+    margin: 0 0 20px;
     color: #4c4c4c;
 }
 
@@ -296,8 +296,8 @@ span.syscmd {
 
 .footer {
     width: auto;
-    padding: 10px 0px;
-    margin: 25px 0px 0px;
+    padding: 10px 0;
+    margin: 25px 0 0;
     border-top: 1px dotted #878787;
     font-size: 0.8em;
     line-height: 140%;
@@ -308,7 +308,7 @@ span.syscmd {
 }
 
 .footer p {
-    margin: 0px;
+    margin: 0;
 }
 
 .footer a {
