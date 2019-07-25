@@ -2,6 +2,7 @@
     background-color: #222222;
     overflow: hidden;
     margin: -8px; /* Default margin on html body is 8px */
+    padding: 12px; /* By experiment */
 }
 
 .topnav a {
