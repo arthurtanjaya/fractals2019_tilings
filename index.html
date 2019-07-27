@@ -1,105 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="description"
-        content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
-    <meta name="referrer" content="no-referrer">
-    <meta name="theme-color" content="#b31b1b">
-    <title>
-        SPUR 2019: Tilings on SG
-    </title>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/latex.css">
-    <script type="text/x-mathjax-config">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
+        <meta name="referrer" content="no-referrer">
+        <meta name="theme-color" content="#b31b1b">
+        <title>
+            SPUR 2019: Tilings on SG
+        </title>
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/latex.css">
+        <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
                 tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
             });
         </script>
-    <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
-</head>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
+    </head>
 
-<body>
-    <nav>
-        <div class="topnav">
-            <a class="active" href="index.html">Home</a>
-            <a href="content/code/index.html">MATLAB Code</a>
-            <a href="content/details/index.html">Details</a>
-            <a href="content/talks/index.html">Talks</a>
-        </div>
-    </nav>
-    <center>
-        <h1>
-            Tilings on the Sierpinski gasket and its blow-ups
-        </h1>
-    </center>
-    <center>
-        <div class="image">
-            <img src="img/svg/elemtransblowup.svg">
-        </div>
-    </center>
-    <h2>
-        Introduction
-    </h2>
-    <p>
-        The aim of this Cornell SPUR project is to study tilings on the Sierpinski gasket and its blow-ups.
-    </p>
-    <h2>
-        Project description
-    </h2>
-    <p>
-        Let $A$ be a closed subset of SG. Consider translates of $A$ that tile SG. So SG is the union of $A_k$, and the
-        intersection of $A_j$ and $A_k$ is either empty or suitably small. Translate means there is a local isometry $T$
-        with $A_k = TA$. For what sets $A$ do such translation tilings exist?
-    </p>
-    <p>
-        A related question involves the existence of a basis (maybe orthonormal) of eigenfunctions of the Laplacian on
-        $A$. The equivalence of these conditions in Euclidean space is called <a
-            href="https://en.wikipedia.org/wiki/Fuglede%27s_conjecture">Fuglede's conjecture</a>, but recently it has
-        been shown to be false in both directions. For example, if $A$ is a $k$-cell then $A$ tiles SG and $A$ has a
-        basis of Dirichlet (or Neumann) eigenfunctions.
-    </p>
-    <p>
-        Although Fuglede's conjecture has been shown to be false in both directions, there are many special cases where
-        it is known to be true, and this has led to a lot of interesting research. We would like to explore related
-        problems on SG.
-    </p>
-    <p>
-        <div class="question">
-            Consider a discrete approximation to $\text{SG}_n$, and let $A \subseteq \text{SG}_n$. When does there exist
-            a set of translations $T$ such that
-            \[
-            \text{SG}_n = \bigsqcup_{\tau_k \in T}(A + \tau_k)?
-            \]
-        </div>
-    </p>
-    <p>
-        <div class="problem">
-            Find an algorithm that gives all such tilings by translations.
-        </div>
-    </p>
-    <p>
-        <div class="question">
-            Again given $A \subseteq \text{SG}_n$, does there exist an orthonomal basis of functions $\{\varphi_j\}$ on
-            $\ell^2(A)$ such that each $\varphi_j$ has an extension $\widetilde{\varphi}_j$ on $\text{SG}_n$ satisfying
-            an eigenvalue equation
-            $-\Delta_n \widetilde{\varphi}_j = \lambda_{n, j} \widetilde{\varphi}_j$ on $\text{SG}_n$?
-        </div>
-    </p>
-    <p>
-        <div class="problem">
-            Find an algorithm that yields all such exponential bases.
-        </div>
-    </p>
-    <p class="footer">
+    <body>
+        <nav>
+            <div class="topnav">
+                <a class="active" href="index.html">Home</a>
+                <a href="content/code/index.html">MATLAB Code</a>
+                <a href="content/details/index.html">Details</a>
+                <a href="content/talks/index.html">Talks</a>
+            </div>
+        </nav>
+        <center>
+            <h1>
+                Tilings on the Sierpinski gasket and its blow-ups
+            </h1>
+        </center>
+        <center>
+            <div class="image">
+                <img src="img/svg/elemtransblowup.svg">
+            </div>
+        </center>
         <h2>
-            Authors
+            Introduction
         </h2>
-        Arthur M. Tanjaya (Undergraduate at Cornell University), Sofya Bykova (Undergraduate at Cornell University),
-        Robert S. Strichartz (Professor at Cornell University), Hua Qiu (Professor at Nanjing University).
-    </p>
-</body>
+        <p>
+            The aim of this Cornell SPUR project is to study tilings on the Sierpinski gasket and its blow-ups.
+        </p>
+        <h2>
+            Project description
+        </h2>
+        <p>
+            Let $A$ be a closed subset of SG. Consider translates of $A$ that tile SG. So SG is the union of $A_k$, and the intersection of $A_j$ and $A_k$ is either empty or suitably small. Translate means there is a local isometry $T$ with $A_k = TA$. For what sets $A$ do such translation tilings exist?
+        </p>
+        <p>
+            A related question involves the existence of a basis (maybe orthonormal) of eigenfunctions of the Laplacian on $A$. The equivalence of these conditions in Euclidean space is called <a href="https://en.wikipedia.org/wiki/Fuglede%27s_conjecture">Fuglede's conjecture</a>, but recently it has been shown to be false in both directions. For example, if $A$ is a $k$-cell then $A$ tiles SG and $A$ has a basis of Dirichlet (or Neumann) eigenfunctions.
+        </p>
+        <p>
+            Although Fuglede's conjecture has been shown to be false in both directions, there are many special cases where it is known to be true, and this has led to a lot of interesting research. We would like to explore related problems on SG.
+        </p>
+        <p>
+            <div class="question">
+                Consider a discrete approximation to $\text{SG}_n$, and let $A \subseteq \text{SG}_n$. When does there exist a set of translations $T$ such that
+                \[
+                \text{SG}_n = \bigsqcup_{\tau_k \in T}(A + \tau_k)?
+                \]
+            </div>
+        </p>
+        <p>
+            <div class="problem">
+                Find an algorithm that gives all such tilings by translations.
+            </div>
+        </p>
+        <p>
+            <div class="question">
+                Again given $A \subseteq \text{SG}_n$, does there exist an orthonomal basis of functions $\{\varphi_j\}$ on $\ell^2(A)$ such that each $\varphi_j$ has an extension $\widetilde{\varphi}_j$ on $\text{SG}_n$ satisfying an eigenvalue equation $-\Delta_n \widetilde{\varphi}_j = \lambda_{n, j} \widetilde{\varphi}_j$ on $\text{SG}_n$?
+            </div>
+        </p>
+        <p>
+            <div class="problem">
+                Find an algorithm that yields all such exponential bases.
+            </div>
+        </p>
+        <p class="footer">
+            <h2>
+                Authors
+            </h2>
+            Arthur M. Tanjaya (Undergraduate at Cornell University), Sofya Bykova (Undergraduate at Cornell University), Robert S. Strichartz (Professor at Cornell University), Hua Qiu (Professor at Nanjing University).
+        </p>
+    </body>
 
 </html>
