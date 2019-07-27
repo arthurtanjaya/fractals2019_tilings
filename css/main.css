@@ -1,11 +1,8 @@
 .topnav {
     background-color: #222222;
     overflow: hidden;
-    margin-left: -8px;
-    padding: 12px;
-    position: fixed;
-    width: 100%;
-    top: 0px
+    margin: -8px; /* Default margin on html body is 8px */
+    padding: 12px; /* By experiment */
 }
 
 .topnav a {
@@ -26,27 +23,28 @@
 
 .sidenav {
     height: 100%;
-    width: 185px;
     position: fixed;
-    z-index: 0;
     top: 0;
     left: 0;
-    margin-top: 47px;
-    background-color: #4c4c4c;
-    overflow-x: hidden;
-    padding-top: 20px;
+    margin-top: 46px; /* By experiment */
+    background-color: #073949;
 }
 
 .sidenav a {
-    padding: 6px 8px 6px 16px;
+    color: #f7f7f7;
+    text-align: center;
+    padding: 14px 16px;
     text-decoration: none;
-    font-size: 25px;
-    color: white;
+    font-size: 17px;
     display: block;
 }
 
+.sidenav a.active {
+    background-color: #b31b1b;
+}
+
 .sidenav a:hover {
-    color: #b31b1b;
+    color: #a2998b;
 }
 
 img {
@@ -56,7 +54,7 @@ img {
 }
 
 .image {
-    padding: 0 40%;
+    margin: 0 40%;
     display: flex;
     flex-direction: column;
 }
@@ -74,7 +72,6 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
 body {
     display: block;
     margin: 8px;
-    margin-top: 55px;
 }
 
 ol, ul {
@@ -139,13 +136,11 @@ h1 {
 a {
     color: (internal value);
     text-decoration: underline;
-    cursor: auto;
 }
 
 a:visited {
     color: (internal value);
     text-decoration: underline;
-    cursor: auto;
 }
 
 p {
