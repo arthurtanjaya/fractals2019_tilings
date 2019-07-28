@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
+        <meta name="referrer" content="no-referrer">
+        <meta name="theme-color" content="#b31b1b">
+        <title>
+            SPUR 2019: Tilings on SG
+        </title>
+        <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/latex.css">
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+        </script>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
+        <meta name="generator" content="MATLAB 9.6">
+    </head>
+
+    <body>
+        <nav>
+            <div class="topnav">
+                <a href="../../index.html">Home</a>
+                <a href="index.html">MATLAB Code</a>
+                <a href="../details/index.html">Details</a>
+                <a href="../talks/index.html">Talks</a>
+            </div>
+            <div class="sidenav">
+                <a class="active" href="GenGraphApprox.html">Generating $\Gamma_m$</a>
+                <a href="Graphing.html">Graphing</a>
+                <a href="Eigenfunctions.html">Eigenfunctions</a>
+                <a href="Spectra.html">Spectra</a>
+            </div>
+        </nav>
+        <center>
+            <h1>
+                Generating $\Gamma_m$
+            </h1>
+            <a href="code_files/raw/CartesianProd.m">CartesianProd.m</a>
+            <a href="code_files/raw/Vertex.m">Vertex.m</a>
+            <a href="code_files/raw/GraphApprox.m">GraphApprox.m</a>
+        </center>
+        <!-- Begin auto-generated content -->
+        <div class="content">
+
+            <pre class="codeinput">
+<span class="keyword">function</span> product = CartesianProd(vector, n)
+<span class="comment">%CARTESIANPROD Returns the n-fold Cartesian product of vector</span>
+<span class="comment">%   If n == 0 then this function returns {[]}</span>
+<span class="comment">% Taken from https://www.mathworks.com/matlabcentral/answers/282777-n-fold-cartesian-product</span>
+
+<span class="keyword">if</span> n == 0
+    product = {[]};
+<span class="keyword">else</span>
+    product = repmat({vector}, 1, n);
+    [product{1:n}] = ndgrid(product{:});
+    product = reshape(cat(n, product{:}), [], n);
+<span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre>
+
+            <pre class="codeinput">
+<span class="keyword">classdef</span> Vertex
+    <span class="comment">%VERTEX For vertices in \Gamma_m</span>
+
+    <span class="keyword">properties</span> (SetAccess = private)
+        level      <span class="comment">% Level of fineness (this is m in \Gamma_m)</span>
+        address    <span class="comment">% A word of length m (row vector)</span>
+        neighbors  <span class="comment">% A vector of addresses of its neighbors</span>
+        xycoords   <span class="comment">% Coordinates in the Cartesian plane</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span> (Static)
+
+        <span class="keyword">function</span> point = Primary(point)
+            <span class="comment">%GET_PRIMARY Returns primary address</span>
+            <span class="comment">%   Passthrough if primary already</span>
+            <span class="comment">%   Twin to get_secondary()</span>
+            <span class="comment">%   Given $F_wq_i$ with $\left|w\right| = m$, the other address</span>
+            <span class="comment">%   can be found using the following procedure.</span>
+            <span class="comment">%   Let $n$ be the least integer such that $w_k = i$ for all</span>
+            <span class="comment">%   $n &lt; k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,</span>
+            <span class="comment">%   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).</span>
+            q = point(1);
+            <span class="keyword">for</span> i = length(point):-1:2
+                <span class="keyword">if</span> point(i) &lt; q  <span class="comment">% Different and currently secondary</span>
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    <span class="keyword">return</span>
+                <span class="keyword">elseif</span> point(i) &gt; q  <span class="comment">% Different but already primary</span>
+                    <span class="keyword">return</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> point = Secondary(point)
+            <span class="comment">%GET_SECONDARY Returns secondary address</span>
+            <span class="comment">%   Passthrough if secondary already</span>
+            <span class="comment">%   Twin to get_primary()</span>
+            <span class="comment">%   Given $F_wq_i$ with $\left|w\right| = m$, the other address</span>
+            <span class="comment">%   can be found using the following procedure.</span>
+            <span class="comment">%   Let $n$ be the least integer such that $w_k = i$ for all</span>
+            <span class="comment">%   $n &lt; k \le m$. Then $j = w_n$ and $w' = (w_1, \dots,</span>
+            <span class="comment">%   w_{n-1}, i, j, \dots, j)$ (with $\left|w'\right| = m$).</span>
+            q = point(1);
+            <span class="keyword">for</span> i = length(point):-1:2
+                <span class="keyword">if</span> point(i) &gt; q  <span class="comment">% Different and currently primary</span>
+                    point(1) = point(i);
+                    point(i) = q;
+                    point(i+1:end) = point(1);
+                    <span class="keyword">return</span>
+                <span class="keyword">elseif</span> point(i) &lt; q  <span class="comment">% Different but already secondary</span>
+                    <span class="keyword">return</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+
+        <span class="keyword">function</span> self = Vertex(address)
+            <span class="comment">%VERTEX Construct an instance of this class</span>
+            <span class="comment">%   Input should be a valid address; no error checking (yet?)</span>
+            self.level = length(address)-1;  <span class="comment">% Off-by-one ugh.</span>
+            self.address = address;
+            self.address = self.get_primary();
+            self = self.set_neighbors();
+            <span class="comment">%TODO No need, this is done in set_neighbors() already</span>
+            <span class="comment">%[numnbrs, ~] = size(self.neighbors);</span>
+            <span class="comment">%for i = 1:numnbrs</span>
+            <span class="comment">%    self.neighbors(i,1:end) = self.Primary(self.neighbors(i,1:end));</span>
+            <span class="comment">%end</span>
+            self = self.set_xycoords();
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> prim = get_primary(self)
+            point = self.address;
+            prim = self.Primary(point);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> sec = get_secondary(self)
+            point = self.address;
+            sec = self.Secondary(point);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> self = set_neighbors(self)
+            <span class="comment">%SET_NEIGHBORS Updates addresses of neighbors of self</span>
+
+            <span class="keyword">if</span> all(self.address == self.address(1))
+                <span class="comment">% Case 1: self is a boundary point</span>
+                <span class="comment">% Then it has only 2 neighbors</span>
+                <span class="keyword">if</span> self.address(1) == 0
+                    self.neighbors = [[self.address(1:end-1) 1];
+                        [self.address(1:end-1) 2]];
+                <span class="keyword">elseif</span> self.address(1) == 1
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% self.address(1) == 2</span>
+                    self.neighbors = [[self.address(1:end-1) 0];
+                        [self.address(1:end-1) 1]];
+                <span class="keyword">end</span>
+            <span class="keyword">else</span>
+                <span class="comment">% Case 2: self is not a boundary point</span>
+                <span class="comment">% Then it has 4 neighbors</span>
+                <span class="comment">% 2 of them come from one cell</span>
+                primary = self.get_primary();
+                <span class="keyword">if</span> primary(end) == 0
+                    self.neighbors = [[primary(1:end-1) 1];
+                        [primary(1:end-1) 2]];
+                <span class="keyword">elseif</span> primary(end) == 1
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% primary(end) == 2</span>
+                    self.neighbors = [[primary(1:end-1) 0];
+                        [primary(1:end-1) 1]];
+                <span class="keyword">end</span>
+                <span class="comment">% The other 2 come from another cell</span>
+                secondary = self.get_secondary();
+                <span class="keyword">if</span> secondary(end) == 0
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 1];
+                        [secondary(1:end-1) 2]];
+                <span class="keyword">elseif</span> secondary(end) == 1
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 2]];
+                <span class="keyword">else</span>  <span class="comment">% secondary(end) == 2</span>
+                    self.neighbors = [self.neighbors;
+                        [secondary(1:end-1) 0];
+                        [secondary(1:end-1) 1]];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% Convert all neighbors' addresses to primary version</span>
+            <span class="keyword">for</span> i = 1:size(self.neighbors, 1)
+                self.neighbors(i, :) = Vertex.Primary(self.neighbors(i, :));
+            <span class="keyword">end</span>
+
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> self = set_xycoords(self)
+            <span class="comment">%SET_NEIGHBORS Updates addresses of neighbors of self</span>
+            <span class="comment">% Start at a boundary point</span>
+            q = [[0.5, 3^0.5/2];
+                [0, 0];
+                [1, 0]];
+            self.xycoords = q(self.address(1)+1, :);  <span class="comment">% Off-by-one again</span>
+            <span class="comment">% Apply IFS based on address of vertex</span>
+            self.xycoords = ApplyIFS_2D(self.xycoords, self.address(2:end));
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> draw(self, side)
+            <span class="comment">%DRAW Draws the vertex in xy-plane</span>
+            <span class="comment">%   side controls the side length of the bounding triangle</span>
+            <span class="comment">%   Assumes that a figure window is already open and hold is on</span>
+            coords = self.xycoords * side;
+            plot(coords(1), coords(2), <span class="string">'.r'</span>)
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre>
+
+            <pre class="codeinput">
+<span class="keyword">classdef</span> GraphApprox
+    <span class="comment">%GRAPHAPPROX Graph Approximation of SG</span>
+
+    <span class="keyword">properties</span> (SetAccess = private)
+        level     <span class="comment">% Level of fineness (this is m in \Gamma_m)</span>
+        vertices  <span class="comment">% Row vector of vertices in the graph</span>
+        edges     <span class="comment">% Row vector of edges in the graph</span>
+    <span class="keyword">end</span>
+
+    <span class="keyword">methods</span>
+
+        <span class="keyword">function</span> self = GraphApprox(level)
+            <span class="comment">%GRAPHAPPROX Construct an instance of this class</span>
+            <span class="comment">%   Input should be an int; no error checking (yet?)</span>
+
+            self.level = level;
+
+            <span class="comment">% Construct vertices</span>
+            <span class="comment">% Construct V_0</span>
+            Z = zeros(1, level+1);  <span class="comment">% Off-by-one ugh.</span>
+            self.vertices = [Vertex(Z) Vertex(Z+1) Vertex(Z+2)];
+            <span class="keyword">for</span> i = 2:level+1
+                <span class="comment">% Construct V_{i-1} from V_{i-2}</span>
+                new_vertices = Vertex.empty(0, 3^(i-1));
+                count = 1;  <span class="comment">% To index new_vertices</span>
+
+                <span class="comment">% Instead of iterating over the vertices in V_{i-2},</span>
+                <span class="comment">% we iterate over the i-2 cells instead</span>
+                <span class="comment">% Cell addressing is unique, so no problems here</span>
+                cell_addresses = CartesianProd([0, 1, 2], i-2);
+                <span class="keyword">for</span> cell_index = 1:3^(i-2)
+                    <span class="keyword">if</span> i == 2
+                        cell = [];  <span class="comment">% Annoying edge case</span>
+                    <span class="keyword">else</span>
+                        cell = cell_addresses(cell_index, :);
+                    <span class="keyword">end</span>
+                    <span class="keyword">for</span> head = 0:2
+                        address = [head cell];
+                        <span class="comment">% Pad the end of address with the vertex bit</span>
+                        address(end+1:level+1) = head;
+                        <span class="comment">% Assign addresses in a cyclic fashion</span>
+                        new_address = [address(1:i-1) <span class="keyword">...</span>
+                                       mod(address(i)+1, 3) <span class="keyword">...</span>
+                                       address(i+1:end)];
+                        new_vertices(count) = Vertex(new_address);
+                        count = count + 1;
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+
+                self.vertices = [self.vertices new_vertices];  <span class="comment">% Save updates</span>
+            <span class="keyword">end</span>
+
+            <span class="comment">% Construct edges</span>
+            <span class="comment">% Two vertices share an edge iff they are in the same m-cell</span>
+            <span class="comment">% Can postpone this, because we can just count neighbors then</span>
+            <span class="comment">% divide by 2</span>
+            self.edges = 0;
+
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> draw(self, side)
+            <span class="comment">%DRAW Draws the graph in xy-plane</span>
+            <span class="comment">%   side controls the side length of the bounding triangle</span>
+            <span class="comment">%   Assumes that a figure window is already open and hold is on</span>
+            <span class="comment">% Draw vertices</span>
+            <span class="keyword">for</span> vertex = self.vertices
+                vertex.draw(side)
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+    <span class="keyword">end</span>
+
+<span class="keyword">end</span>
+</pre>
+
+            <p class="footer">
+                <br>
+                <a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a>
+                <br>
+            </p>
+        </div>
+        <!-- End auto-generated content -->
+    </body>
+
+</html>

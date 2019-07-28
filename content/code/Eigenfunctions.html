@@ -1,326 +1,324 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-    <meta charset="utf-8">
-    <meta name="description"
-        content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
-    <meta name="referrer" content="no-referrer">
-    <meta name="theme-color" content="#b31b1b">
-    <title>
-
-    </title>
-    <link rel="stylesheet" href="../../css/main.css">
-    <link rel="stylesheet" href="../../css/latex.css">
-    <script type="text/x-mathjax-config">
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
+        <meta name="referrer" content="no-referrer">
+        <meta name="theme-color" content="#b31b1b">
+        <title>
+            SPUR 2019: Tilings on SG
+        </title>
+        <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/latex.css">
+        <script type="text/x-mathjax-config">
             MathJax.Hub.Config({
                 tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
             });
         </script>
-    <script type="text/javascript" async
-        src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
-    <meta name="generator" content="MATLAB 9.6">
-    <style>
-        body {
-            margin-left: 168px
-        }
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
+        <meta name="generator" content="MATLAB 9.6">
+    </head>
 
-        .topnav {
-            margin-left: -168px
-        }
-    </style>
-</head>
+    <body>
+        <nav>
+            <div class="topnav">
+                <a href="../../index.html">Home</a>
+                <a href="index.html">MATLAB Code</a>
+                <a href="../details/index.html">Details</a>
+                <a href="../talks/index.html">Talks</a>
+            </div>
+            <div class="sidenav">
+                <a href="GenGraphApprox.html">Generating $\Gamma_m$</a>
+                <a href="Graphing.html">Graphing</a>
+                <a class="active" href="Eigenfunctions.html">Eigenfunctions</a>
+                <a href="Spectra.html">Spectra</a>
+            </div>
+        </nav>
+        <center>
+            <h1>
+                Finding eigenfunctions
+            </h1>
+            <a href="code_files/raw/EF.m">EF.m</a>
+            <a href="code_files/raw/SpectralDecimation.m">SpectralDecimation.m</a>
+        </center>
+        <!-- Begin auto-generated content -->
+        <div class="content">
 
-<body>
-    <nav>
-        <div class="topnav">
-            <a href="../../index.html">Home</a>
-            <a href="index.html">MATLAB Code</a>
-            <a href="../details/index.html">Details</a>
-            <a href="../talks/index.html">Talks</a>
-        </div>
-        <div class="sidenav">
-            <a href="GraphApproxEd.html">generating $\Gamma_n$</a>
-        </div>
-    </nav>
-    <center>
-        <h1>
-            Finding eigenfunctions
-        </h1>
-        <a href="code_files/EF.m">EF.m</a>
-        <a href="code_files/SpectralDecimation.m">SpectralDecimation.m</a>
-    </center>
-    <!-- Begin auto-generated content -->
+            <pre class="codeinput">
+<span class="keyword">classdef</span> EF
 
-    <div class="content">
-        <pre class="codeinput"><span class="keyword">classdef</span> EF
+    <span class="keyword">methods</span> (Static)
 
-        <span class="keyword">methods</span> (Static)
-    
-            <span class="keyword">function</span> is_eigen = EigenfunctionCheck(level, eigenvalue, eigenfunction)
-                <span class="comment">% EIGENFUNCTIONCHECK returns true if eigenfunction is an</span>
-                <span class="comment">% eigenfunction of the laplacian with the given eigenvalue.</span>
-                <span class="comment">% Eigenfunction must be a row vector of length equal to the</span>
-                <span class="comment">% number of vertices in Gamma_level.</span>
-                gamma = GraphApprox(level);
-                npts = length(gamma.vertices);
-                lapl = GLaplacian(gamma, eigenfunction);
-                laplpar = lapl(4:npts);
-                is_eigen = norm(laplpar+eigenvalue*eigenfunction(4:npts)) &lt; 0.001;
+        <span class="keyword">function</span> is_eigen = EigenfunctionCheck(level, eigenvalue, eigenfunction)
+            <span class="comment">% EIGENFUNCTIONCHECK returns true if eigenfunction is an</span>
+            <span class="comment">% eigenfunction of the laplacian with the given eigenvalue.</span>
+            <span class="comment">% Eigenfunction must be a row vector of length equal to the</span>
+            <span class="comment">% number of vertices in Gamma_level.</span>
+            gamma = GraphApprox(level);
+            npts = length(gamma.vertices);
+            lapl = GLaplacian(gamma, eigenfunction);
+            laplpar = lapl(4:npts);
+            is_eigen = norm(laplpar+eigenvalue*eigenfunction(4:npts)) &lt; 0.001;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> ok = EigenfunctionsCheck(efs, evs)
+            <span class="comment">%EIGENFUNCTIONSCHECK returns true if each row of efs matrix is</span>
+            <span class="comment">%an eigenfunction of the laplacian with the eigenvalue equal to</span>
+            <span class="comment">%the corresponding entry of evs (a column vector).</span>
+            [n, plevel] = size(efs);
+            level = int8( log(2*plevel-3)/log(3) - 1 );
+            arr = zeros(1, n);
+            <span class="keyword">for</span> i = 1:n
+                arr(i) = EF.EigenfunctionCheck(level, evs(i, 1), efs(i, :));
             <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> ok = EigenfunctionsCheck(efs, evs)
-                <span class="comment">%EIGENFUNCTIONSCHECK returns true if each row of efs matrix is</span>
-                <span class="comment">%an eigenfunction of the laplacian with the eigenvalue equal to</span>
-                <span class="comment">%the corresponding entry of evs (a column vector).</span>
-                [n, plevel] = size(efs);
-                level = int8( log(2*plevel-3)/log(3) - 1 );
-                arr = zeros(1, n);
-                <span class="keyword">for</span> i = 1:n
-                    arr(i) = EF.EigenfunctionCheck(level, evs(i, 1), efs(i, :));
+            ok = all(arr);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> eigenfunctions = Eigenfunctions(level, eigenvalue)
+            <span class="comment">% EIGENFUNCTIONS(l, e) is the list of Dirichlet eigenfunctions with</span>
+            <span class="comment">% eigenvalue e on SG approximation of level l</span>
+            npts = length(GraphApprox(level).vertices);
+            syms <span class="string">x</span> <span class="string">[1 npts]</span>;
+            laplvar = GLaplacian(GraphApprox(level), x);
+            laplparvar = laplvar(4:npts);
+            eigenfunctions = solve([laplparvar == -sym(eigenvalue)*x(4:npts), x(1:3) == [0 0 0], norm(x)^2 ~= 0], x, <span class="string">'ReturnCondition'</span>, true);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func, list] = Shrink(old, level, vertex)
+            <span class="comment">%SHRINK reproduces old - a function on Gamma_n - on the 1-cell</span>
+            <span class="comment">%adjacent to the given vertex of Gamma_{n+1}</span>
+            <span class="comment">%(where level must be equal to n+1)</span>
+            graphNew = GraphApprox(level).vertices;
+            graphOld = GraphApprox(level-1).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list = zeros([1,(3^(level+1)+3)/2]);
+            <span class="keyword">for</span> i = 1 : (3^level+3)/2
+                oldAddress = graphOld(i).address;
+                newAddress = Vertex.Primary([oldAddress(1), vertex, oldAddress(2:end)]);
+                j = GraphApprox.lookup(graphNew, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = ShrinkAll(old, level, vertex)
+            <span class="comment">%SHRINKALL applies Shrink to several functions (represented as</span>
+            <span class="comment">% columns of the matrix old). All functions are shrunk to the</span>
+            <span class="comment">% same 1-cell given by vertex.</span>
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            <span class="keyword">for</span> i = 1:num
+                [func, list] = EF.Shrink(old{1}(1:end,i)', level, vertex);
+                new{1}(1:length,i) = func(1:length)';
+            <span class="keyword">end</span>
+            new{2} = old{2};
+            new{3} = list(old{3});
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func, list] = Reflect(old, level, vertices)
+            graph = GraphApprox(level).vertices;
+            func = zeros([1,(3^(level+1)+3)/2]);
+            list  = zeros([1,(3^(level+1)+3)/2]);
+            <span class="keyword">for</span> i = 1 : (3^(level+1)+3)/2
+                oldAddress = graph(i).address;
+                newAddress = oldAddress;
+                newAddress(oldAddress == vertices(1)) = vertices(2);
+                newAddress(oldAddress == vertices(2)) = vertices(1);
+                newAddress = Vertex.Primary(newAddress);
+                j = GraphApprox.lookup(graph, level, newAddress);
+                func(j) = old(i);
+                list(i) = j;
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> [func,list] = ExtendLocal(old, level, vertices)
+            [func1, list] = EF.Shrink(old, level, vertices(1));
+            func2 = EF.Shrink(EF.Reflect(old, level-1,vertices), level, vertices(2));
+            func = func1-func2;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = ExtendAll(old, level, vertices)
+            length = (3^(level+1)+3)/2;
+            [~, num] = size(old{1});
+            <span class="keyword">for</span> i = 1:num
+                [func, list] = EF.ExtendLocal(old{1}(1:end,i)', level, vertices);
+                new{1}(1:length,i) = func(1:length)';
+            <span class="keyword">end</span>
+            new{2} = old{2};
+            new{3} = list(old{3});
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+            <pre class="codeinput">
+<span class="keyword">classdef</span> SpectralDecimation
+
+    <span class="keyword">methods</span>(Static)
+        <span class="keyword">function</span> evlist = Eigenvalues(level)
+            <span class="comment">%EIGENVLAUES(level) gives a list of eigenvalues</span>
+            <span class="keyword">if</span> level == 1
+                evlist = [2, 5];
+            <span class="keyword">else</span>
+                evlist = [5, 6];
+                prev = SpectralDecimation.Eigenvalues(level - 1);
+                <span class="keyword">for</span> i = 1 : length(prev)
+                    ev = prev(i);
+                    evlist = [evlist, (5+(25-4*ev)^(1/2))/2, (5-(25-4*ev)^(1/2))/2];
                 <span class="keyword">end</span>
-                ok = all(arr);
             <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> eigenfunctions = Eigenfunctions(level, eigenvalue)
-                <span class="comment">% EIGENFUNCTIONS(l, e) is the list of Dirichlet eigenfunctions with</span>
-                <span class="comment">% eigenvalue e on SG approximation of level l</span>
-                npts = length(GraphApprox(level).vertices);
-                syms <span class="string">x</span> <span class="string">[1 npts]</span>;
-                laplvar = GLaplacian(GraphApprox(level), x);
-                laplparvar = laplvar(4:npts);
-                eigenfunctions = solve([laplparvar == -sym(eigenvalue)*x(4:npts), x(1:3) == [0 0 0], norm(x)^2 ~= 0], x, <span class="string">'ReturnCondition'</span>, true);
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> new = Initial(level)
+            <span class="comment">%INITIAL(level) gives the list of initial eigenfunctions and</span>
+            <span class="comment">%the corresponding eigenvalues (which are 2, 5, and 6).</span>
+            <span class="comment">%Eigenfunctions are represented as column vectors, eigenvalues</span>
+            <span class="comment">%are stored in a row vector.</span>
+            <span class="keyword">if</span> level == 1
+                twos = EF.Eigenfunctions(level, 2);
+                dim1 = length(twos.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim1
+                        new.x(i,j) = subs(twos.(strcat(<span class="string">'x'</span>,int2str(i))), twos.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                fives = EF.Eigenfunctions(level, 5);
+                dim2 = length(fives.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim2
+                        new.x(i,dim1 + j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                new.eigenvalues = [2*ones([1,dim1]), 5*ones([1,dim2])];
+
+            <span class="keyword">else</span>
+                fives = EF.Eigenfunctions(level, 5);
+                dim1 = length(fives.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim1
+                        new.x(i,j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                sixes = EF.Eigenfunctions(level, 6);
+                dim2 = length(sixes.parameters);
+                <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
+                    <span class="keyword">for</span> j = 1 : dim2
+                        new.x(i, dim1 + j) = subs(sixes.(strcat(<span class="string">'x'</span>,int2str(i))), sixes.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                new.eigenvalues = [5*ones([1,dim1]), 6*ones([1,dim2,1])];
             <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> [func, list] = Shrink(old, level, vertex)
-                <span class="comment">%SHRINK reproduces old - a function on Gamma_n - on the 1-cell</span>
-                <span class="comment">%adjacent to the given vertex of Gamma_{n+1}</span>
-                <span class="comment">%(where level must be equal to n+1)</span>
-                graphNew = GraphApprox(level).vertices;
-                graphOld = GraphApprox(level-1).vertices;
-                func = zeros([1,(3^(level+1)+3)/2]);
-                list = zeros([1,(3^(level+1)+3)/2]);
-                <span class="keyword">for</span> i = 1 : (3^level+3)/2
-                    oldAddress = graphOld(i).address;
-                    newAddress = Vertex.Primary([oldAddress(1), vertex, oldAddress(2:end)]);
-                    j = GraphApprox.lookup(graphNew, level, newAddress);
-                    func(j) = old(i);
-                    list(i) = j;
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> expand = Continued(level, eigenvalue, old)
+            <span class="comment">%CONTINUED(l, e, old) gives the list of continued</span>
+            <span class="comment">%eigenfunctions with eigenvalue e</span>
+            <span class="comment">%that result from eigenfunction old on SG</span>
+            <span class="comment">%approximation of level l-1.</span>
+            expand = zeros([1, (3^(level+1)+3)/2]);
+            SG = GraphApprox(level).vertices;
+            SGprev = GraphApprox(level - 1).vertices;
+            <span class="keyword">for</span> j = 1 : (3^(level+1) + 3)/2
+                <span class="keyword">if</span> SG(j).address(1) == SG(j).address(end)
+                    oldaddress = SG(j).address(1:end-1);
+                    expand(1,j) = old(GraphApprox.lookup(SGprev,level-1,oldaddress));
+                <span class="keyword">else</span>
+                    nbrs = SG(j).neighbors;
+                    fx1x2 = [];
+                    y1y2 = [];
+                    <span class="keyword">for</span> l = 1 : 4
+                        nbr = nbrs(l,:);
+                        <span class="keyword">if</span> nbr(1) == nbr(end)
+                            fx1x2 = [fx1x2, old(GraphApprox.lookup(SGprev,level-1,nbr(1:end-1)))];
+                        <span class="keyword">else</span>
+                            y1y2 = [y1y2, GraphApprox.lookup(SG,level,nbr)];
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                    x3b = intersect(SG(y1y2(1)).neighbors, SG(y1y2(2)).neighbors, <span class="string">'rows'</span>);
+                    <span class="keyword">for</span> m = 1 : 2
+                        t = x3b(m,:);
+                        <span class="keyword">if</span> t(1) == t(end)
+                            fx3 = old(GraphApprox.lookup(SGprev,level-1,t(1:end-1)));
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                    fy0 = ((4 - eigenvalue) * (fx1x2(1) + fx1x2(2)) + 2 * fx3)/((2 - eigenvalue)*(5 - eigenvalue));
+                    expand(1,j) = fy0;
                 <span class="keyword">end</span>
             <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> new = ShrinkAll(old, level, vertex)
-                <span class="comment">%SHRINKALL applies Shrink to several functions (represented as</span>
-                <span class="comment">% columns of the matrix old). All functions are shrunk to the</span>
-                <span class="comment">% same 1-cell given by vertex.</span>
-                length = (3^(level+1)+3)/2;
-                [~, num] = size(old{1});
-                <span class="keyword">for</span> i = 1:num
-                    [func, list] = EF.Shrink(old{1}(1:end,i)', level, vertex);
-                    new{1}(1:length,i) = func(1:length)';
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> result = Expand(level, old, varargin)
+            result{1} = [];
+            result{2} = [];
+            result{3} = old{3};
+            <span class="keyword">if</span> nargin == 2
+            <span class="keyword">for</span> i = 1 : length(old{2})
+                ev = old{2}(i);
+                evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                newplus = SpectralDecimation.Continued(level, evplus, old{1}(1:end,i)');
+                newminus = SpectralDecimation.Continued(level, evminus, old{1}(1:end,i)');
+                <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
+                    result{2} = [result{2}, evplus];
+                    result{1} = [result{1}, newplus'];
                 <span class="keyword">end</span>
-                new{2} = old{2};
-                new{3} = list(old{3});
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> [func, list] = Reflect(old, level, vertices)
-                graph = GraphApprox(level).vertices;
-                func = zeros([1,(3^(level+1)+3)/2]);
-                list  = zeros([1,(3^(level+1)+3)/2]);
-                <span class="keyword">for</span> i = 1 : (3^(level+1)+3)/2
-                    oldAddress = graph(i).address;
-                    newAddress = oldAddress;
-                    newAddress(oldAddress == vertices(1)) = vertices(2);
-                    newAddress(oldAddress == vertices(2)) = vertices(1);
-                    newAddress = Vertex.Primary(newAddress);
-                    j = GraphApprox.lookup(graph, level, newAddress);
-                    func(j) = old(i);
-                    list(i) = j;
+                <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
+                    result{2} = [result{2}, evminus];
+                    result{1} = [result{1}, newminus'];
                 <span class="keyword">end</span>
             <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> [func,list] = ExtendLocal(old, level, vertices)
-                [func1, list] = EF.Shrink(old, level, vertices(1));
-                func2 = EF.Shrink(EF.Reflect(old, level-1,vertices), level, vertices(2));
-                func = func1-func2;
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> new = ExtendAll(old, level, vertices)
-                length = (3^(level+1)+3)/2;
-                [~, num] = size(old{1});
-                <span class="keyword">for</span> i = 1:num
-                    [func, list] = EF.ExtendLocal(old{1}(1:end,i)', level, vertices);
-                    new{1}(1:length,i) = func(1:length)';
+            <span class="keyword">else</span>
+                seq = varargin{1};
+                <span class="keyword">for</span> i = 1 : length(seq)
+                    ev = old{2}(i);
+                    <span class="keyword">if</span> seq(i) &gt;= 0
+                        evnew = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    <span class="keyword">else</span>
+                        evnew = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    <span class="keyword">end</span>
+                    new = SpectralDecimation.Continued(level, evnew, old{1}(1:end,i)');
+                    <span class="keyword">if</span> evnew ~= 2 &amp;&amp; evnew ~= 5
+                        result{2} = [result{2}, evnew];
+                        result{1} = [result{1}, new'];
+                    <span class="keyword">end</span>
                 <span class="keyword">end</span>
-                new{2} = old{2};
-                new{3} = list(old{3});
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="keyword">function</span> result = Eigenfunctions(level)
+            result = SpectralDecimation.Initial(level);
+            <span class="keyword">if</span> level &gt; 1
+                old = SpectralDecimation.Eigenfunctions(level - 1);
+                <span class="keyword">for</span> i = 1 : length(old.eigenvalues)
+                    ev = old.eigenvalues(i);
+                    evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
+                    evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
+                    newplus = SpectralDecimation.Continued(level, evplus, old.x(1:end,i)');
+                    newminus = SpectralDecimation.Continued(level, evminus, old.x(1:end,i)');
+                    <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evplus];
+                        result.x = [result.x, newplus'];
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
+                        result.eigenvalues = [result.eigenvalues, evminus];
+                        result.x = [result.x, newminus'];
+                    <span class="keyword">end</span>
+
+                <span class="keyword">end</span>
             <span class="keyword">end</span>
         <span class="keyword">end</span>
     <span class="keyword">end</span>
-    </pre>
-        <pre class="codeinput"><span class="keyword">classdef</span> SpectralDecimation
+<span class="keyword">end</span>
+</pre>
 
-        <span class="keyword">methods</span>(Static)
-            <span class="keyword">function</span> evlist = Eigenvalues(level)
-                <span class="comment">%EIGENVLAUES(level) gives a list of eigenvalues</span>
-                <span class="keyword">if</span> level == 1
-                    evlist = [2, 5];
-                <span class="keyword">else</span>
-                    evlist = [5, 6];
-                    prev = SpectralDecimation.Eigenvalues(level - 1);
-                    <span class="keyword">for</span> i = 1 : length(prev)
-                        ev = prev(i);
-                        evlist = [evlist, (5+(25-4*ev)^(1/2))/2, (5-(25-4*ev)^(1/2))/2];
-                    <span class="keyword">end</span>
-                <span class="keyword">end</span>
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> new = Initial(level)
-                <span class="comment">%INITIAL(level) gives the list of initial eigenfunctions and</span>
-                <span class="comment">%the corresponding eigenvalues (which are 2, 5, and 6).</span>
-                <span class="comment">%Eigenfunctions are represented as column vectors, eigenvalues</span>
-                <span class="comment">%are stored in a row vector.</span>
-                <span class="keyword">if</span> level == 1
-                    twos = EF.Eigenfunctions(level, 2);
-                    dim1 = length(twos.parameters);
-                    <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
-                        <span class="keyword">for</span> j = 1 : dim1
-                            new.x(i,j) = subs(twos.(strcat(<span class="string">'x'</span>,int2str(i))), twos.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
-                        <span class="keyword">end</span>
-                    <span class="keyword">end</span>
-                    fives = EF.Eigenfunctions(level, 5);
-                    dim2 = length(fives.parameters);
-                    <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
-                        <span class="keyword">for</span> j = 1 : dim2
-                            new.x(i,dim1 + j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
-                        <span class="keyword">end</span>
-                    <span class="keyword">end</span>
-                    new.eigenvalues = [2*ones([1,dim1]), 5*ones([1,dim2])];
-    
-                <span class="keyword">else</span>
-                    fives = EF.Eigenfunctions(level, 5);
-                    dim1 = length(fives.parameters);
-                    <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
-                        <span class="keyword">for</span> j = 1 : dim1
-                            new.x(i,j) = subs(fives.(strcat(<span class="string">'x'</span>,int2str(i))), fives.parameters, [zeros([1,j-1]), 1, zeros([1, dim1-j])]);
-                        <span class="keyword">end</span>
-                    <span class="keyword">end</span>
-                    sixes = EF.Eigenfunctions(level, 6);
-                    dim2 = length(sixes.parameters);
-                    <span class="keyword">for</span> i = 1 : (3^(level+1) + 3)/ 2
-                        <span class="keyword">for</span> j = 1 : dim2
-                            new.x(i, dim1 + j) = subs(sixes.(strcat(<span class="string">'x'</span>,int2str(i))), sixes.parameters, [zeros([1,j-1]), 1, zeros([1, dim2-j])]);
-                        <span class="keyword">end</span>
-                    <span class="keyword">end</span>
-                    new.eigenvalues = [5*ones([1,dim1]), 6*ones([1,dim2,1])];
-                <span class="keyword">end</span>
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> expand = Continued(level, eigenvalue, old)
-                <span class="comment">%CONTINUED(l, e, old) gives the list of continued</span>
-                <span class="comment">%eigenfunctions with eigenvalue e</span>
-                <span class="comment">%that result from eigenfunction old on SG</span>
-                <span class="comment">%approximation of level l-1.</span>
-                expand = zeros([1, (3^(level+1)+3)/2]);
-                SG = GraphApprox(level).vertices;
-                SGprev = GraphApprox(level - 1).vertices;
-                <span class="keyword">for</span> j = 1 : (3^(level+1) + 3)/2
-                    <span class="keyword">if</span> SG(j).address(1) == SG(j).address(end)
-                        oldaddress = SG(j).address(1:end-1);
-                        expand(1,j) = old(GraphApprox.lookup(SGprev,level-1,oldaddress));
-                    <span class="keyword">else</span>
-                        nbrs = SG(j).neighbors;
-                        fx1x2 = [];
-                        y1y2 = [];
-                        <span class="keyword">for</span> l = 1 : 4
-                            nbr = nbrs(l,:);
-                            <span class="keyword">if</span> nbr(1) == nbr(end)
-                                fx1x2 = [fx1x2, old(GraphApprox.lookup(SGprev,level-1,nbr(1:end-1)))];
-                            <span class="keyword">else</span>
-                                y1y2 = [y1y2, GraphApprox.lookup(SG,level,nbr)];
-                            <span class="keyword">end</span>
-                        <span class="keyword">end</span>
-                        x3b = intersect(SG(y1y2(1)).neighbors, SG(y1y2(2)).neighbors, <span class="string">'rows'</span>);
-                        <span class="keyword">for</span> m = 1 : 2
-                            t = x3b(m,:);
-                            <span class="keyword">if</span> t(1) == t(end)
-                                fx3 = old(GraphApprox.lookup(SGprev,level-1,t(1:end-1)));
-                            <span class="keyword">end</span>
-                        <span class="keyword">end</span>
-                        fy0 = ((4 - eigenvalue) * (fx1x2(1) + fx1x2(2)) + 2 * fx3)/((2 - eigenvalue)*(5 - eigenvalue));
-                        expand(1,j) = fy0;
-                    <span class="keyword">end</span>
-                <span class="keyword">end</span>
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> result = Expand(level, old, varargin)
-                result{1} = [];
-                result{2} = [];
-                result{3} = old{3};
-                <span class="keyword">if</span> nargin == 2
-                <span class="keyword">for</span> i = 1 : length(old{2})
-                    ev = old{2}(i);
-                    evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
-                    evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
-                    newplus = SpectralDecimation.Continued(level, evplus, old{1}(1:end,i)');
-                    newminus = SpectralDecimation.Continued(level, evminus, old{1}(1:end,i)');
-                    <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
-                        result{2} = [result{2}, evplus];
-                        result{1} = [result{1}, newplus'];
-                    <span class="keyword">end</span>
-                    <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
-                        result{2} = [result{2}, evminus];
-                        result{1} = [result{1}, newminus'];
-                    <span class="keyword">end</span>
-                <span class="keyword">end</span>
-                <span class="keyword">else</span>
-                    seq = varargin{1};
-                    <span class="keyword">for</span> i = 1 : length(seq)
-                        ev = old{2}(i);
-                        <span class="keyword">if</span> seq(i) &gt;= 0
-                            evnew = (5 + (25 - 4 * ev)^(1/2)) / 2;
-                        <span class="keyword">else</span>
-                            evnew = (5 - (25 - 4 * ev)^(1/2)) / 2;
-                        <span class="keyword">end</span>
-                        new = SpectralDecimation.Continued(level, evnew, old{1}(1:end,i)');
-                        <span class="keyword">if</span> evnew ~= 2 &amp;&amp; evnew ~= 5
-                            result{2} = [result{2}, evnew];
-                            result{1} = [result{1}, new'];
-                        <span class="keyword">end</span>
-                    <span class="keyword">end</span>
-                <span class="keyword">end</span>
-            <span class="keyword">end</span>
-    
-            <span class="keyword">function</span> result = Eigenfunctions(level)
-                result = SpectralDecimation.Initial(level);
-                <span class="keyword">if</span> level &gt; 1
-                    old = SpectralDecimation.Eigenfunctions(level - 1);
-                    <span class="keyword">for</span> i = 1 : length(old.eigenvalues)
-                        ev = old.eigenvalues(i);
-                        evplus = (5 + (25 - 4 * ev)^(1/2)) / 2;
-                        evminus = (5 - (25 - 4 * ev)^(1/2)) / 2;
-                        newplus = SpectralDecimation.Continued(level, evplus, old.x(1:end,i)');
-                        newminus = SpectralDecimation.Continued(level, evminus, old.x(1:end,i)');
-                        <span class="keyword">if</span> evplus ~= 2 &amp;&amp; evplus ~= 5
-                            result.eigenvalues = [result.eigenvalues, evplus];
-                            result.x = [result.x, newplus'];
-                        <span class="keyword">end</span>
-                        <span class="keyword">if</span> evminus ~= 2 &amp;&amp; evminus ~= 5
-                            result.eigenvalues = [result.eigenvalues, evminus];
-                            result.x = [result.x, newminus'];
-                        <span class="keyword">end</span>
-    
-                    <span class="keyword">end</span>
-                <span class="keyword">end</span>
-            <span class="keyword">end</span>
-        <span class="keyword">end</span>
-    <span class="keyword">end</span>   
-    </pre>
-        <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg;
-                R2019a</a><br></p>
-    </div>
-
-    <!-- End auto-generated content -->
-</body>
+            <p class="footer">
+                <br>
+                <a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a>
+                <br>
+            </p>
+        </div>
+        <!-- End auto-generated content -->
+    </body>
 
 </html>

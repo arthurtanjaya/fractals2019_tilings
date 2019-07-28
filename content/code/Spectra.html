@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
+        <meta name="referrer" content="no-referrer">
+        <meta name="theme-color" content="#b31b1b">
+        <title>
+            SPUR 2019: Tilings on SG
+        </title>
+        <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/latex.css">
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+        </script>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
+        <meta name="generator" content="MATLAB 9.6">
+    </head>
+
+    <body>
+        <nav>
+            <div class="topnav">
+                <a href="../../index.html">Home</a>
+                <a href="index.html">MATLAB Code</a>
+                <a href="../details/index.html">Details</a>
+                <a href="../talks/index.html">Talks</a>
+            </div>
+            <div class="sidenav">
+                <a href="GenGraphApprox.html">Generating $\Gamma_m$</a>
+                <a href="Graphing.html">Graphing</a>
+                <a href="Eigenfunctions.html">Eigenfunctions</a>
+                <a class="active" href="Spectra.html">Spectra</a>
+            </div>
+        </nav>
+        <center>
+            <h1>
+                Finding spectra
+            </h1>
+            <a href="code_files/raw/Orthonormal.m">Orthonormal.m</a>
+        </center>
+        <!-- Begin auto-generated content -->
+        <div class="content">
+
+            <pre class="codeinput">
+<span class="keyword">classdef</span> Orthonormal
+
+    <span class="keyword">methods</span>(Static)
+        <span class="keyword">function</span> check = Test(spectrum, details)
+            <span class="comment">%TEST(s,d) returns 1 if the set of functions s (formatted as a result</span>
+            <span class="comment">%of functions below) is an orthogonal spectrum with the given</span>
+            <span class="comment">%eigenvalues</span>
+            mat = double(spectrum{1}(spectrum{3}, 1:end)'*spectrum{1}(spectrum{3}, 1:end));
+            <span class="comment">%orth = norm(mat - eye(length(spectrum{3}))) &lt; 0.1;</span>
+            orth = norm(mat - diag(diag(mat))) &lt; 0.1 &amp;&amp; rank(mat) == length(mat);
+            eigen = EF.EigenfunctionsCheck(spectrum{1}', spectrum{2}');
+            <span class="keyword">if</span> details
+                disp([<span class="string">"orthogonal:"</span>,orth])
+                disp(mat)
+                disp([<span class="string">"eigenfunctions:"</span>, eigen])
+            <span class="keyword">end</span>
+            check = orth &amp;&amp; eigen;
+        <span class="keyword">end</span>
+
+        <span class="comment">%the spectrum searching functions below have the same</span>
+        <span class="comment">%specifications as FindSpectrum</span>
+        <span class="comment">%choose set of eigenvalues randomly, solve</span>
+        <span class="keyword">function</span> result = FindSpectrum(basis, tile, limit, numerical, varargin)
+            <span class="comment">%FINDSPECTRUM(b, t, l, n) returns an orthogonal spectrum of the</span>
+            <span class="comment">%subset (i.e., set of points) t of the  SG approximations given by b.</span>
+            <span class="comment">%l specifies the number of attempts to solve for the spectrum.</span>
+            <span class="comment">%If n is set to true, equations are solved numerically.</span>
+            <span class="comment">%The output is a cell array where the first entry conatins the</span>
+            <span class="comment">%matrix of eigenfunctions, the second enrty is the row vector</span>
+            <span class="comment">%of eigenvalues, the third entry is t.</span>
+            w = waitbar(0,mat2str(tile));
+            <span class="keyword">if</span> numerical
+                digits(4)
+            <span class="keyword">end</span>
+            dim = length(basis.eigenvalues);
+            sdim = length(tile);
+            syms <span class="string">P</span> <span class="string">[dim dim]</span>;
+            assume(P, <span class="string">'real'</span>)
+            indep = ones([dim, dim]);
+            <span class="keyword">for</span> i = 1:dim
+                <span class="keyword">for</span> j = 1 : i
+                    <span class="keyword">if</span> basis.eigenvalues(i) ~= basis.eigenvalues(j)
+                        indep(i,j) = 0;
+                        indep(j,i) = 0;
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            new = (basis.x)*(P.*indep);
+            <span class="keyword">for</span> n = 1:limit
+                waitbar(n/limit,w);
+                chosen = randperm(dim, sdim);
+                subnew = new(tile, chosen);
+                conditions = [];
+                <span class="keyword">if</span> nargin == 5
+                    syms <span class="string">u</span> <span class="string">[dim+3 1]</span>;
+                    <span class="keyword">for</span> k = 1:sdim
+                        conditions = [conditions,subs(varargin{1}, u, new(1:end,chosen(k)))];
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> numerical
+                    eqa = vpa(subnew'*subnew == eye(sdim));
+                    sol = vpasolve([reshape(eqa, [1, sdim^2]), conditions]);
+                <span class="keyword">else</span>
+                    eqa = vpa(simplify(subnew'*subnew == eye(sdim)));
+                    sol = solve([reshape(eqa, [1, sdim^2]),conditions]);
+                <span class="keyword">end</span>
+                resP = zeros([dim dim]);
+                <span class="keyword">for</span> i = 1 : dim
+                    <span class="keyword">for</span> j = 1 : dim
+                        <span class="keyword">if</span> isfield(sol, strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j))) &amp;&amp; not(isempty(sol.(strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j)))))
+                            resP(i,j) = subs(sol.(strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j)))(1,1), P, zeros([dim dim]));
+                        <span class="keyword">else</span>
+                            resP(i, j) = 0;
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> resP == zeros([dim dim])
+                    <span class="keyword">continue</span>
+                <span class="keyword">else</span>
+                    orthB = (basis.x)*(resP.*indep);
+                    orth = orthB(1:end,chosen);
+                    eigenvalues = basis.eigenvalues(chosen);
+                    result = {orth, eigenvalues, tile};
+                    digits(32)
+                    close(w);
+                    <span class="keyword">return</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            digits(32)
+            result = {};
+            close(w);
+        <span class="keyword">end</span>
+
+        <span class="comment">%same but with parallel</span>
+        <span class="keyword">function</span> result = FindSpectrumPar(basis, tile, limit,numerical)
+            <span class="keyword">if</span> numerical
+                digits(4)
+            <span class="keyword">else</span>
+            digits(32)
+            <span class="keyword">end</span>
+            results = [];
+            dim = length(basis.eigenvalues);
+            sdim = length(tile);
+            indep = ones([dim, dim]);
+            <span class="keyword">for</span> i = 1:dim
+                <span class="keyword">for</span> j = 1 : i
+                    <span class="keyword">if</span> basis.eigenvalues(i) ~= basis.eigenvalues(j)
+                        indep(i,j) = 0;
+                        indep(j,i) = 0;
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            syms <span class="string">P</span> <span class="string">[dim dim]</span>;
+            assume(P, <span class="string">'real'</span>)
+            new = (basis.x)*(P.*indep);
+            tilenew = new(tile, 1:end);
+            eqa = vpa(simplify(tilenew'*tilenew == eye(dim)));
+            <span class="keyword">parfor</span> n = 1:limit
+                chosen = randperm(dim, sdim);
+                subeqa = eqa(chosen, chosen);
+                <span class="keyword">if</span> numerical
+                    sol = vpasolve(reshape(subeqa, [1, sdim^2]));
+                <span class="keyword">else</span>
+                    sol = solve(reshape(subeqa, [1, sdim^2]));
+                <span class="keyword">end</span>
+                resP = zeros([dim dim]);
+                <span class="keyword">for</span> i = 1 : dim
+                    <span class="keyword">for</span> j = 1 : dim
+                        <span class="keyword">if</span> isfield(sol, strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j))) &amp;&amp; not(isempty(sol.(strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j)))))
+                            vary = symvar(sol.(strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j)))(1,1))
+                            l = length(vary)
+                            resP(i,j) = subs(sol.(strcat(<span class="string">'P'</span>,int2str(i),<span class="string">'_'</span>,int2str(j)))(1,1), vary, zeros([1 l]));<span class="comment">%sol.(strcat('P',int2str(i),'_',int2str(j)))(1,1)</span>
+                        <span class="keyword">else</span>
+                            resP(i, j) = 0;
+                        <span class="keyword">end</span>
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+                <span class="keyword">if</span> resP == zeros([dim dim])
+                    <span class="keyword">continue</span>
+                <span class="keyword">else</span>
+                    orthB = (basis.x)*(resP.*indep);
+                    orth = orthB(1:end,chosen);
+                    eigenvalues = basis.eigenvalues(chosen);
+                    result = {orth, eigenvalues, tile};
+                    results = [results,{result}];
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+            digits(32)
+            <span class="keyword">if</span> not(isempty(results))
+                result = results(1);
+                result = result{1};
+            <span class="keyword">else</span>
+                result = {};
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">%try adding vetors one by one choosing random eigenvalue each time</span>
+        <span class="keyword">function</span> result = Spectrum(basis, tile, limit)
+            [npts, ~] = size(basis.x);
+            dim = length(tile);
+            result{3} = tile;
+            <span class="keyword">for</span> i = 1:limit
+                evunique = unique(basis.eigenvalues);
+                result{1} = zeros([npts, dim]);
+                result{2} = zeros([1 dim]);
+                curr = 0;
+                <span class="keyword">while</span> not(isempty(evunique))
+                    idx = randi(length(evunique));
+                    ev = evunique(idx);
+                    subbasis = basis.x(1:end, basis.eigenvalues == ev);
+                    tilebasis = basis.x(tile, basis.eigenvalues == ev);
+                    [~, num] = size(tilebasis);
+                    syms <span class="string">v</span> <span class="string">[num 1]</span>
+                    new = tilebasis*v;
+                    <span class="keyword">if</span> curr &gt; 0
+                        sol = solve([simplify(result{1}(tile,1:curr)'* new == zeros([curr,1])), simplify(norm(new)^2 == 1)], v);
+                    <span class="keyword">else</span>
+                        sol = vpasolve(simplify(norm(new)^2 == 1), v);
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> isempty(sol)
+                        evunique(idx) = [];
+                    <span class="keyword">else</span>
+                        resV = zeros([num 1]);
+                        <span class="keyword">if</span> num == 1
+                            resV = sol;
+                        <span class="keyword">elseif</span> isempty(sol.v1)
+                            evunique(idx) = [];
+                            <span class="keyword">continue</span>
+                        <span class="keyword">else</span>
+                            <span class="keyword">for</span> j = 1 : num
+                                <span class="keyword">if</span> isfield(sol, strcat(<span class="string">'v'</span>,int2str(j)))
+                                    resV(j,1) = sol.(strcat(<span class="string">'v'</span>,int2str(j)))(1,1);
+                                <span class="keyword">end</span>
+                            <span class="keyword">end</span>
+                        <span class="keyword">end</span>
+                        result{1}(1:end, curr+1) = subbasis*resV;
+                        result{2}(curr+1) = ev;
+                        curr = curr + 1;
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> result{2}(dim) ~= 0
+                        <span class="keyword">return</span>
+                    <span class="keyword">end</span>
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+
+        <span class="comment">%same but using null instead of solve</span>
+        <span class="keyword">function</span> result = Spectrum2(basis, tile, limit, varargin)
+            [npts, ~] = size(basis.x);
+            dim = length(tile);
+            result{3} = tile;
+            <span class="keyword">if</span> nargin &gt; 3
+                evs = varargin{1};
+            <span class="keyword">end</span>
+            <span class="keyword">for</span> i = 1:limit
+                <span class="keyword">if</span> nargin &gt; 3
+                    evs = evs(randperm(length(evs)));
+                <span class="keyword">end</span>
+                evunique = unique(basis.eigenvalues);
+                result{1} = zeros([npts, dim]);
+                result{2} = zeros([1 dim]);
+                curr = 0;
+                counter = 0;
+                <span class="keyword">while</span> not(isempty(evunique) || (nargin &gt; 3 &amp;&amp; counter == length(evs)))
+                    <span class="keyword">if</span> nargin &gt; 3
+                        ev = evs(curr+1);
+                        evactual = basis.eigenvalues(abs(basis.eigenvalues - ev)&lt;0.01);
+                        ev = evactual(1);
+                    <span class="keyword">else</span>
+                        idx = randi(length(evunique));
+                        ev = evunique(idx);
+                    <span class="keyword">end</span>
+                    subbasis = basis.x(1:end, basis.eigenvalues == ev);
+                    tilebasis = basis.x(tile, basis.eigenvalues == ev);
+                    [~, num] = size(tilebasis);
+                    syms <span class="string">v</span> <span class="string">[num 1]</span>
+                    new = tilebasis*v;
+                    <span class="keyword">if</span> curr &gt; 0
+                        [A,~] = equationsToMatrix(result{1}(tile,1:curr)'* new == zeros([curr,1]), v);
+                        sol = null(A);
+                        <span class="keyword">if</span> isempty(sol)
+                            evunique(evunique == ev) = [];
+                        <span class="keyword">else</span>
+                            [~, nsp] = size(sol);
+                            order = randperm(nsp);
+                            <span class="keyword">for</span> k = 1:nsp
+                                vec = subbasis*sol(1:end,order(k));
+                                <span class="keyword">if</span> vec(tile,1) == zeros([dim 1])
+                                    <span class="keyword">if</span> k == nsp
+                                        evunique(evunique == ev) = [];
+                                    <span class="keyword">end</span>
+                                    <span class="keyword">continue</span>
+                                <span class="keyword">else</span>
+                                    result{1}(1:end, curr+1) = vec;
+                                    result{2}(curr+1) = ev;
+                                    curr = curr + 1;
+                                    <span class="keyword">break</span>
+                                <span class="keyword">end</span>
+                            <span class="keyword">end</span>
+                        <span class="keyword">end</span>
+                    <span class="keyword">else</span>
+<span class="comment">                        %{
+</span><span class="comment">                        sol = vpasolve(simplify(norm(new)^2 == 1), v);
+</span><span class="comment">                        resV = zeros([num 1]);
+</span><span class="comment">                        if num == 1
+</span><span class="comment">                            resV = sol;
+</span><span class="comment">                        elseif isempty(sol.v1)
+</span><span class="comment">                            evunique(evunique == ev) = [];
+</span><span class="comment">                            continue
+</span><span class="comment">                        else
+</span><span class="comment">                            for j = 1 : num
+</span><span class="comment">                                if isfield(sol, strcat('v',int2str(j)))
+</span><span class="comment">                                    resV(j,1) = sol.(strcat('v',int2str(j)))(1,1);
+</span><span class="comment">                                end
+</span><span class="comment">                            end
+</span><span class="comment">                        end
+</span><span class="comment">                        %}
+</span>                        resV = zeros([num 1]);
+                        resV(1,1) = 1;
+                        result{1}(1:end, curr+1) = subbasis*resV;
+                        result{2}(curr+1) = ev;
+                        curr = curr + 1;
+
+                    <span class="keyword">end</span>
+                    <span class="keyword">if</span> result{2}(dim) ~= 0
+                        <span class="keyword">return</span>
+                    <span class="keyword">end</span>
+                    counter = counter + 1;
+                <span class="keyword">end</span>
+            <span class="keyword">end</span>
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+</pre>
+
+            <p class="footer">
+                <br>
+                <a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a>
+                <br>
+            </p>
+        </div>
+        <!-- End auto-generated content -->
+    </body>
+
+</html>

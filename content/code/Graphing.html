@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <meta name="description" content="Cornell SPUR 2019 Analysis on Fractals: Tilings on the Sierpinski gasket and its blow-ups">
+        <meta name="referrer" content="no-referrer">
+        <meta name="theme-color" content="#b31b1b">
+        <title>
+            SPUR 2019: Tilings on SG
+        </title>
+        <link rel="stylesheet" href="../../css/main.css">
+        <link rel="stylesheet" href="../../css/latex.css">
+        <script type="text/x-mathjax-config">
+            MathJax.Hub.Config({
+                tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}
+            });
+        </script>
+        <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS_CHTML"></script>
+        <meta name="generator" content="MATLAB 9.6">
+    </head>
+
+    <body>
+        <nav>
+            <div class="topnav">
+                <a href="../../index.html">Home</a>
+                <a href="index.html">MATLAB Code</a>
+                <a href="../details/index.html">Details</a>
+                <a href="../talks/index.html">Talks</a>
+            </div>
+            <div class="sidenav">
+                <a href="GenGraphApprox.html">Generating $\Gamma_m$</a>
+                <a class="active" href="Graphing.html">Graphing</a>
+                <a href="Eigenfunctions.html">Eigenfunctions</a>
+                <a href="Spectra.html">Spectra</a>
+            </div>
+        </nav>
+        <center>
+            <h1>
+                Graphical representations of $\Gamma_m$
+            </h1>
+            <a href="code_files/raw/ApplyIFS_2D.m">ApplyIFS_2D.m</a>
+            <a href="code_files/raw/graphtext.m">graphtext.m</a>
+        </center>
+        <!-- Begin auto-generated content -->
+        <div class="content">
+
+            <pre class="codeinput">
+<span class="keyword">function</span> coord = ApplyIFS_2D(coord, word)
+<span class="comment">%APPLYIFS_2D applies F_{word} to coord, in 2D Cartesian coordinates</span>
+<span class="comment">%   Note that word should not include the first bit of a vertex address</span>
+
+<span class="comment">% Define parameters</span>
+r = 1/2;              <span class="comment">% Contraction ratio</span>
+q = [[0.5, 3^0.5/2];
+     [0, 0];
+     [1, 0]];         <span class="comment">% Fixed points of respective contractions</span>
+F = @(x, i) r*(x-q(i+1, :)) + q(i+1, :);  <span class="comment">% Contractions</span>
+
+<span class="keyword">for</span> w = word(end:-1:1)
+    coord = F(coord, w);
+<span class="keyword">end</span>
+</pre>
+
+            <pre class="codeinput">
+<span class="keyword">function</span> [] = graphtext(level,z_vals, tile, num, varargin)
+<span class="comment">%takes a row vector of column vectors</span>
+<span class="comment">%each column vector is a standard address with a z-value appended on the</span>
+<span class="comment">%end</span>
+g = GraphApprox(level);
+plotting_points = zeros([level+1, (3^(level+1)+3)/2]);
+<span class="keyword">for</span> i = 1:(3^(level+1)+3)/2
+    plotting_points(1:end,i) = g.vertices(i).address';
+<span class="keyword">end</span>
+<span class="comment">%gasketdata = [plotting_points; z_vals];</span>
+gasketdata = plotting_points;
+<span class="comment">%declaring empty output</span>
+X = zeros(length(gasketdata),1);
+Y = zeros(length(gasketdata),1);
+<span class="comment">%defining IFS</span>
+f2 = @(x) 1/2*(x-[0.5,sqrt(3)]) + [0.5,sqrt(3)];
+f1 = @(x) 1/2*(x-[1,0]) + [1,0];
+f0 = @(x) 1/2*(x-[0,0]);
+<span class="comment">%for each point...</span>
+<span class="keyword">for</span> i = 1:length(gasketdata)
+    <span class="comment">%find the proper qi...</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 0
+        cartesian = [0,0];
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 1
+        cartesian = [1,0];
+    <span class="keyword">end</span>
+    <span class="keyword">if</span> gasketdata(1,i) == 2
+        cartesian = [0.5,sqrt(3)];
+    <span class="keyword">end</span>
+    <span class="comment">%...and iterate the funciton maps to get the actual point</span>
+    <span class="keyword">for</span> j = length(gasketdata(:,i)):-1:2
+        <span class="keyword">if</span> gasketdata(j,i) == 0
+            cartesian = f0(cartesian);
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> gasketdata(j,i) == 1
+            cartesian = f1(cartesian);
+        <span class="keyword">end</span>
+        <span class="keyword">if</span> gasketdata(j,i) == 2
+            cartesian = f2(cartesian);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+    <span class="comment">%insert this x,y,z triple into the cartesian vectors for output</span>
+    X(i,1) = cartesian(1);
+    Y(i,1) = cartesian(2);
+    Z(i,1) = z_vals(i);
+<span class="keyword">end</span>
+hold <span class="string">on</span>
+scatter(X,Y,<span class="string">'.r'</span>)
+<span class="keyword">for</span> i = tile
+    tileX = X(tile);
+    tileY = Y(tile);
+    scatter(tileX,tileY, <span class="string">'r'</span>, <span class="string">'filled'</span>);
+<span class="keyword">end</span>
+
+<span class="comment">%Z = 1:(3^(level+1)+3)/2;</span>
+<span class="keyword">if</span> num
+    nonzeroX = X(Z ~= 0);
+    nonzeroY = Y(Z ~= 0);
+    nonzeroZ = Z(Z ~= 0);
+    text(nonzeroX,nonzeroY+0.05,num2str(double(nonzeroZ)), <span class="string">'FontSize'</span>, 15)
+<span class="keyword">else</span>
+    text(X+0.01,Y+0.06,Z,<span class="string">'FontSize'</span>, 15)
+<span class="keyword">end</span>
+[numedges, ~] = size(g.edges);
+<span class="keyword">for</span>  i = 1:numedges
+    Xedge = X(g.edges(i,1:2));
+    Yedge = Y(g.edges(i,1:2));
+    plot(Xedge, Yedge, <span class="string">'k'</span>);
+<span class="keyword">end</span>
+
+<span class="keyword">if</span> nargin &gt; 4
+    <span class="keyword">for</span> i = 5:nargin
+        data = varargin{i-4};
+        <span class="keyword">if</span> data{1} == <span class="string">"p"</span>
+            plot(data{2:end});
+        <span class="keyword">else</span>
+            text(data{2:end}, <span class="string">'FontSize'</span>, 15);
+        <span class="keyword">end</span>
+    <span class="keyword">end</span>
+<span class="keyword">end</span>
+    ax = gca;
+    ax.XColor = <span class="string">'none'</span>;
+    ax.YColor = <span class="string">'none'</span>;
+
+    hold <span class="string">off</span>
+<span class="keyword">end</span>
+</pre>
+
+            <p class="footer">
+                <br>
+                <a href="https://www.mathworks.com/products/matlab/">Published with MATLAB&reg; R2019a</a>
+                <br>
+            </p>
+        </div>
+        <!-- End auto-generated content -->
+    </body>
+
+</html>
